@@ -1,13 +1,8 @@
-const CACHE = 'emotion-wheel-v3';
-const FILES = [
-  './index.html',
-  './manifest.json'
-];
+const CACHE = 'ew-' + '20260608-2320';
+const FILES = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(FILES))
-  );
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
   self.skipWaiting();
 });
 
