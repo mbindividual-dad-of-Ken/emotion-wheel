@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="theme-color" content="#2f3349"/>
 <link rel="manifest" href="manifest.json"/>
-<title>情緒輪光譜 v3｜SEL 情緒詞彙工具</title>
+<title>情緒輪光譜 v5｜SEL 情緒詞彙工具</title>
 <style>
 :root{
   --bg:#f7f3ec;--paper:#fffaf2;--ink:#2f3349;--muted:#74798c;--line:#e8dfd1;
@@ -134,6 +134,21 @@ h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
 .footer{margin-top:24px;color:var(--muted);font-size:12px;text-align:center;}
 .copy-badge{display:inline-block;font-size:11px;background:var(--ink);color:#fff;padding:2px 8px;border-radius:8px;margin-left:6px;opacity:0;transition:opacity .2s;}
 .copy-badge.show{opacity:1;}
+/* TOAST */
+#addToast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:13px;font-weight:700;padding:10px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(47,51,73,.25);opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;z-index:99;white-space:nowrap;}
+#addToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* NAV BADGE */
+.nav-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#e05050;color:#fff;font-size:10px;font-weight:800;margin-left:4px;vertical-align:middle;line-height:1;}
+/* WHEEL SELECTED */
+.wheel-selected{stroke:#2f3349;stroke-width:3;filter:brightness(.9);}
+/* ROLE HINT */
+.role-hint{font-size:11px;color:var(--muted);margin-bottom:12px;padding:6px 10px;background:rgba(255,255,255,.6);border-radius:10px;border:1px solid var(--line);}
+/* ONBOARDING TIP */
+.tip-bubble{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;padding:8px 14px;border-radius:12px;white-space:nowrap;z-index:20;pointer-events:none;animation:tipfade 4s ease forwards;}
+.tip-bubble::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-bottom-color:var(--ink);border-top:none;}
+@keyframes tipfade{0%{opacity:0;transform:translateX(-50%) translateY(4px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
+/* SORT REFERENCE */
+.sort-ref{font-size:12px;color:var(--muted);margin-top:8px;padding:8px 12px;background:rgba(255,255,255,.7);border-radius:12px;border:1px dashed var(--line);}
 
 @media(max-width:850px){
   .grid{grid-template-columns:1fr;}
@@ -172,7 +187,7 @@ h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
     <button class="active" data-tab="wheel">情緒輪</button>
     <button data-tab="explore">探索</button>
     <button data-tab="draw">抽選</button>
-    <button data-tab="mine">我的感受</button>
+    <button data-tab="mine">我的感受<span class="nav-badge" id="mineBadge" style="display:none;">0</span></button>
     <button data-tab="sort">光譜排序</button>
     <button data-tab="quad">四象限</button>
     <button data-tab="settings">角色設定</button>
@@ -180,9 +195,13 @@ h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
 </header>
 
 <main>
+<div id="addToast">✓ 已加入我的感受</div>
 
 <!-- 角色視角列（全域） -->
-<div class="role-bar" id="globalRoleBar"></div>
+<div style="position:relative;">
+  <div class="role-bar" id="globalRoleBar"></div>
+  <div class="role-hint">切換視角後，情緒輪右側的「情境說明」會跟著改變，協助不同年齡或使用情境對應。</div>
+</div>
 
 <!-- ① 情緒輪 -->
 <section id="wheel" class="panel active">
@@ -236,7 +255,7 @@ h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
       <div class="result-card" id="drawResult">
         <div class="bigface">🎲</div>
         <div class="bigword">還沒抽</div>
-        <p class="prompt">按左側按鈕，看看今天遇到哪一種感受。</p>
+        <p class="prompt">按上方按鈕，看看今天遇到哪一種感受。</p>
       </div>
     </div>
   </div>
@@ -278,7 +297,9 @@ h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
       <div class="toolbar">
         <button onclick="newSortGame()">換一組</button>
         <button onclick="clearSort()">清除重排</button>
+        <button onclick="showSortRef()">查看參考排序</button>
       </div>
+      <div class="sort-ref" id="sortRef" style="display:none;"></div>
       <div class="emotion-grid" id="sortPool"></div>
     </div>
   </div>
@@ -372,42 +393,78 @@ const levels = ['一點點','有一些','很明顯','很強烈'];
 
 /* 情緒詞庫 [family, word, en, desc, quad] */
 const rawEmotions = [
-  ['joy','愉快','happy','心裡亮亮的','highGood'],
+  ['joy','愉快','content','心裡亮亮的','highGood'],
+  ['joy','舒暢','pleasant','有種輕盈的感覺','highGood'],
   ['joy','開心','glad','覺得事情很好','highGood'],
+  ['joy','快樂','happy','想跟大家分享','highGood'],
   ['joy','興奮','excited','很想跳起來','highGood'],
+  ['joy','雀躍','elated','停不下來的開心','highGood'],
+  ['joy','欣喜','delighted','好像被光照到','highGood'],
   ['joy','狂喜','ecstatic','好像快裝不下','highGood'],
+  ['trust','接受','accepting','願意讓它存在','lowGood'],
+  ['trust','寬容','tolerant','不介意不一樣','lowGood'],
   ['trust','放心','relieved','不用一直擔心','lowGood'],
   ['trust','安心','safe','覺得被保護','lowGood'],
   ['trust','信任','trusting','願意靠近別人','lowGood'],
+  ['trust','依賴','reliant','想靠著你','lowGood'],
   ['trust','被接住','held','有人懂我','lowGood'],
+  ['trust','崇敬','admiration','心裡有你的位置','lowGood'],
+  ['fear','隱憂','unease','有點說不清','lowHard'],
   ['fear','不安','uneasy','有點怪怪的','lowHard'],
   ['fear','擔心','worried','怕事情不好','lowHard'],
+  ['fear','憂慮','anxious','停不下來的擔心','lowHard'],
   ['fear','害怕','afraid','想躲起來','highHard'],
+  ['fear','恐懼','fearful','身體有反應了','highHard'],
   ['fear','驚恐','terrified','身體很緊繃','highHard'],
+  ['fear','恐慌','panic','無法控制了','highHard'],
   ['surprise','好奇','curious','想多知道一點','highGood'],
+  ['surprise','疑惑','puzzled','搞不清楚狀況','highGood'],
   ['surprise','意外','surprised','跟想的不一樣','highGood'],
+  ['surprise','訝異','astonished','有點說不出話','highGood'],
   ['surprise','震驚','shocked','一時說不出話','highHard'],
   ['surprise','慌亂','flustered','不知道先做什麼','highHard'],
+  ['surprise','錯愕','stunned','整個人愣住了','highHard'],
+  ['surprise','目瞪口呆','dumbfounded','大腦暫時停機','highHard'],
+  ['sad','有點低落','blue','不太有精神','lowHard'],
   ['sad','失落','down','覺得少了一塊','lowHard'],
   ['sad','委屈','hurt','想被聽見','lowHard'],
+  ['sad','惆悵','wistful','說不清楚的悶','lowHard'],
   ['sad','難過','sad','心裡重重的','lowHard'],
+  ['sad','悲傷','sorrowful','眼淚想出來','lowHard'],
+  ['sad','心碎','heartbroken','感覺裂開了','lowHard'],
   ['sad','崩潰','devastated','很難自己整理','lowHard'],
-  ['disgust','不喜歡','dislike','不太想要','lowHard'],
+  ['disgust','有點不喜歡','dislike','不太想要','lowHard'],
+  ['disgust','乏味','bored','沒什麼興趣','lowHard'],
+  ['disgust','不屑','disdain','看不上眼','lowHard'],
   ['disgust','厭煩','annoyed','一直被煩到','highHard'],
+  ['disgust','嫌棄','contempt','不想碰','highHard'],
   ['disgust','排斥','repulsed','很想遠離','highHard'],
+  ['disgust','噁心','disgusted','生理反應了','highHard'],
   ['disgust','受不了','fed up','已經滿出來了','highHard'],
+  ['anger','有點不爽','peeved','輕微被惹到','highHard'],
   ['anger','不爽','irritated','覺得被卡住','highHard'],
+  ['anger','煩躁','frustrated','一直卡一直卡','highHard'],
   ['anger','生氣','angry','界線被碰到','highHard'],
+  ['anger','氣憤','indignant','覺得不公平','highHard'],
   ['anger','憤怒','furious','很想大聲說不','highHard'],
+  ['anger','盛怒','outraged','快壓不住了','highHard'],
   ['anger','暴怒','enraged','身體像要爆開','highHard'],
+  ['anticipation','留意','attentive','開始注意到了','highGood'],
   ['anticipation','想要','wanting','心裡有方向','highGood'],
+  ['anticipation','好奇心','interested','想靠近看看','highGood'],
   ['anticipation','期待','hopeful','等著好事發生','highGood'],
+  ['anticipation','盼望','wishful','很希望成真','highGood'],
   ['anticipation','緊張','nervous','又期待又怕','highHard'],
-  ['anticipation','迫不及待','eager','很想立刻開始','highGood'],
-  ['calm','平靜','calm','現在剛剛好','lowGood'],
-  ['calm','放鬆','relaxed','身體慢慢鬆開','lowGood'],
-  ['calm','疲倦','tired','需要休息一下','lowHard'],
+  ['anticipation','渴望','eager','非常非常想要','highGood'],
+  ['anticipation','迫不及待','impatient','很想立刻開始','highGood'],
   ['calm','空空的','numb','暫時說不出感覺','lowHard'],
+  ['calm','疲倦','tired','需要休息一下','lowHard'],
+  ['calm','沉靜','quiet','不想說話也ok','lowGood'],
+  ['calm','放鬆','relaxed','身體慢慢鬆開','lowGood'],
+  ['calm','平靜','calm','現在剛剛好','lowGood'],
+  ['calm','安穩','settled','不需要什麼了','lowGood'],
+  ['calm','舒適','comfortable','身心都在對的地方','lowGood'],
+  ['calm','自在','at ease','做自己就好','lowGood'],
 ];
 const emotions = rawEmotions.map((e,i)=>({id:i,family:e[0],word:e[1],en:e[2],desc:e[3],quad:e[4],level:i%4}));
 
@@ -483,8 +540,8 @@ const characters = [
 let state = {
   tab: 'wheel',
   family: null,
-  character: 'child',
-  role: 'k',
+  character: localStorage.getItem('ew_character') || 'child',
+  role: localStorage.getItem('ew_role') || 'k',
   selected: [],
   drawn: [],
   sort: [],
@@ -548,6 +605,7 @@ function renderRoleBars(){
 }
 function setRole(id){
   state.role = id;
+  localStorage.setItem('ew_role', id);
   renderRoleBars();
   if(state.family) renderSpectrum(state.family);
   renderExplore();
@@ -590,7 +648,7 @@ function renderWheel(){
       html+=`<path d="M${x1i} ${y1i} A${rin} ${rin} 0 0 1 ${x2i} ${y2i} L${x2o} ${y2o} A${rout} ${rout} 0 0 0 ${x1o} ${y1o}Z"
         fill="${fills[ri]}" style="cursor:pointer;transition:opacity .15s;"
         onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'"
-        onclick="renderSpectrum('${f.key}')"/>`;
+        onclick="selectWheelSector('${f.key}')" id="sector-${f.key}"/>`;
     }
 
     /* 標籤 */
@@ -615,6 +673,34 @@ function renderWheel(){
     font-family="-apple-system,Noto Sans TC,sans-serif">感受</text>`;
 
   svg.innerHTML = html;
+  if(state.family) highlightWheelSector(state.family);
+}
+function selectWheelSector(key){
+  renderSpectrum(key);
+  highlightWheelSector(key);
+  showOnboardingTip();
+}
+function highlightWheelSector(key){
+  const svg = document.getElementById('wheelSvg');
+  svg.querySelectorAll('path').forEach(p=>{
+    const isSelected = p.id === 'sector-'+key;
+    p.style.opacity = isSelected ? '1' : '0.72';
+    p.style.strokeWidth = isSelected ? '3' : '0';
+    p.style.stroke = isSelected ? '#2f3349' : 'none';
+  });
+}
+let _tipShown = false;
+function showOnboardingTip(){
+  if(_tipShown || localStorage.getItem('ew_tip_shown')) return;
+  _tipShown = true;
+  localStorage.setItem('ew_tip_shown','1');
+  const card = document.getElementById('spectrumCard');
+  const tip = document.createElement('div');
+  tip.className = 'tip-bubble';
+  tip.textContent = '點詞彙可加入「我的感受」！';
+  card.style.position = 'relative';
+  card.appendChild(tip);
+  setTimeout(()=>tip.remove(), 4500);
 }
 
 /* =========================================================
@@ -630,19 +716,22 @@ function renderSpectrum(key){
   const roleId = state.role;
   const face = faceFor(key);
 
-  $('#spectrum').innerHTML = list.map((e,i) => {
-    const ctxText = ctxFor(key, roleId, Math.min(i,3));
-    return `<div class="spec-row">
-      <div class="spec-level">${levels[i]||'補充'}</div>
-      <div class="spec-bar">
-        <div class="spec-chip" style="--tone:${f.color};grid-column:span 4;"
+  /* group by level bucket (every 2 words = 1 level, 8 words → 4 levels) */
+  const bucketSize = Math.ceil(list.length / levels.length);
+  const buckets = levels.map((lv,li) => ({lv, words: list.slice(li*bucketSize,(li+1)*bucketSize)}));
+
+  $('#spectrum').innerHTML = buckets.map((b,bi) => {
+    if(!b.words.length) return '';
+    const ctxText = ctxFor(key, roleId, Math.min(bi,3));
+    const chips = b.words.map(e=>`<div class="spec-chip" style="--tone:${f.color};"
           onclick="addEmotion(${e.id})"
           title="${ctxText}">
           ${face} ${e.word}
           <small>${e.desc}</small>
-          <div class="ctx-tip">${ctxText}</div>
-        </div>
-      </div>
+        </div>`).join('');
+    return `<div class="spec-row">
+      <div class="spec-level">${b.lv}</div>
+      <div class="spec-bar" style="grid-template-columns:repeat(${b.words.length},1fr);">${chips}</div>
     </div>`;
   }).join('') || '<div class="empty">這個情緒尚未建立詞彙。</div>';
 
@@ -722,6 +811,7 @@ function renderDrawCharacters(){
 }
 function setCharacter(key){
   state.character = key;
+  localStorage.setItem('ew_character', key);
   renderCharacters();
   renderDrawCharacters();
   renderWheel();
@@ -734,12 +824,28 @@ function setCharacter(key){
    ADD / REMOVE EMOTION
    ========================================================= */
 function addEmotion(id){
-  if(!state.selected.includes(id)) state.selected.push(id);
+  const wasIn = state.selected.includes(id);
+  if(!wasIn) state.selected.push(id);
   else state.selected = state.selected.filter(x=>x!==id);
   renderExplore();
   renderSelected();
+  updateMineBadge();
+  if(!wasIn) showAddToast();
 }
-function clearSelected(){ state.selected=[]; renderExplore(); renderSelected(); }
+function showAddToast(){
+  const t = document.getElementById('addToast');
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2000);
+}
+function updateMineBadge(){
+  const badge = document.getElementById('mineBadge');
+  if(!badge) return;
+  const n = state.selected.length;
+  badge.textContent = n;
+  badge.style.display = n > 0 ? 'inline-flex' : 'none';
+}
+function clearSelected(){ state.selected=[]; renderExplore(); renderSelected(); updateMineBadge(); }
 function renderSelected(){
   const box = $('#selectedList');
   if(!state.selected.length){
@@ -778,7 +884,7 @@ function drawEmotion(unique=false){
     </div>`;
   $('#drawResult').style.background=`linear-gradient(145deg,rgba(255,255,255,.88),${f.hex}55)`;
 }
-function resetDrawn(){ state.drawn=[]; $('#drawResult').innerHTML='<div class="bigface">🎲</div><div class="bigword">還沒抽</div><p class="prompt">按下按鈕，看看今天會遇到哪一種感受。</p>';}
+function resetDrawn(){ state.drawn=[]; $('#drawResult').innerHTML='<div class="bigface">🎲</div><div class="bigword">還沒抽</div><p class="prompt">按上方按鈕，看看今天會遇到哪一種感受。</p>';}
 
 /* =========================================================
    SORT GAME
@@ -802,6 +908,14 @@ function placeSort(id){
   empty.innerHTML=`<div><div class="ec-word">${faceFor(e.family)} ${e.word}</div><div class="tiny">${e.desc}</div></div>`;
 }
 function clearSort(){ $$('#sortBoard .slot').forEach((s,i)=>{s.classList.remove('filled');s.textContent=levels[i];}); }
+function showSortRef(){
+  const ref = document.getElementById('sortRef');
+  const pool = $$('#sortPool .emotion-card');
+  if(!pool.length){ ref.style.display='none'; return; }
+  const words = pool.map(c=>c.querySelector('.ec-word')?.textContent||'').filter(Boolean);
+  ref.style.display = 'block';
+  ref.innerHTML = '<strong>參考排序（依詞彙強度，僅供討論）：</strong><br>' + words.join(' → ') + '<br><span style="font-size:11px;color:var(--muted);">沒有標準答案，重要的是說出你的理由。</span>';
+}
 
 /* =========================================================
    QUADRANT
@@ -830,8 +944,15 @@ function saveFeelingCard(){
   ctx2.font='96px sans-serif'; ctx2.fillText($('#posterFace').textContent,600,250);
   ctx2.font='bold 52px sans-serif'; wrap(ctx2,$('#posterText').textContent,600,380,960,66);
   ctx2.font='30px sans-serif'; ctx2.fillStyle='#74798c'; wrap(ctx2,$('#posterSub').textContent,600,600,940,46);
-  ctx2.font='22px sans-serif'; ctx2.fillText('情緒輪光譜 v3｜我現在的感受',600,800);
-  const a=document.createElement('a'); a.href=c.toDataURL('image/png'); a.download='我的感受.png'; a.click();
+  ctx2.font='22px sans-serif'; ctx2.fillText('情緒輪光譜 v5｜我現在的感受',600,800);
+  const dataUrl = c.toDataURL('image/png');
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if(isIOS){
+    const w = window.open('', '_blank');
+    if(w){ w.document.write('<img src="'+dataUrl+'" style="max-width:100%;"><p style="font-family:sans-serif;color:#555;text-align:center;">長按圖片，選擇「儲存到相片」</p>'); }
+  } else {
+    const a=document.createElement('a'); a.href=dataUrl; a.download='我的感受.png'; a.click();
+  }
 }
 function wrap(ctx2,text,x,y,maxWidth,lineHeight){
   let words=[...text],line='';
@@ -848,10 +969,12 @@ function exportSettings(){
   navigator.clipboard?.writeText($('#settingsOutput').textContent);
 }
 function resetAll(){
+  ['ew_character','ew_role','ew_tip_shown'].forEach(k=>localStorage.removeItem(k));
   state={tab:'wheel',family:null,character:'child',role:'k',selected:[],drawn:[],sort:[]};
   $$('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab==='wheel'));
   $$('.panel').forEach(p=>p.classList.toggle('active',p.id==='wheel'));
   init();
+  updateMineBadge();
 }
 
 /* =========================================================
@@ -871,6 +994,7 @@ $('#installBtn').onclick=async()=>{
 };
 
 init();
+updateMineBadge();
 </script>
 </body>
 </html>
