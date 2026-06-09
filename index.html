@@ -1,172 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta name="theme-color" content="#2f3349"/>
-<link rel="manifest" href="manifest.json"/>
-<title>情緒輪光譜 v5｜SEL 情緒詞彙工具</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#2f3349" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<title>情緒輪光譜 v6｜孩子與大人一起說出感受</title>
 <style>
 :root{
   --bg:#f7f3ec;--paper:#fffaf2;--ink:#2f3349;--muted:#74798c;--line:#e8dfd1;
-  --shadow:0 18px 45px rgba(47,51,73,.12);--round:22px;
-  --joy:#ffd166;--trust:#95d5b2;--fear:#bdb2ff;--surprise:#9bf6ff;
-  --sad:#a0c4ff;--disgust:#caffbf;--anger:#ffadad;--anticipation:#ffc6a8;--calm:#d8e2dc;
+  --soft:#fdf6ea;--shadow:0 18px 45px rgba(47,51,73,.12);--round:24px;
+  --joy:#ffe45c;--trust:#87e3b5;--fear:#c9b6ff;--surprise:#74e6ea;
+  --sad:#91c9ff;--disgust:#b5f79b;--anger:#ff9fa3;--anticipation:#ffbd7b;--calm:#d8e2dc;
+  --focus:#2f3349;--ok:#40916c;--danger:#e76f51;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.55;}
-.app{max-width:1180px;margin:auto;padding:18px 16px 80px;}
-header{position:sticky;top:0;z-index:10;margin:-18px -16px 18px;padding:14px 16px;background:rgba(247,243,236,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(232,223,209,.7);}
-.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;}
-h1{font-size:clamp(22px,3.5vw,38px);margin:0 0 2px;letter-spacing:.02em;}
-.subtitle{color:var(--muted);font-size:14px;}
-.hbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
-nav{display:flex;gap:8px;overflow:auto;padding:8px 0 2px;scrollbar-width:none;}
-nav::-webkit-scrollbar{display:none;}
-nav button{border:0;border-radius:999px;padding:8px 14px;background:rgba(255,255,255,.7);border:1px solid rgba(232,223,209,.9);color:var(--ink);cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;transition:.15s;}
-nav button.active{background:var(--ink);color:#fff;border-color:var(--ink);}
-button{border:0;border-radius:999px;padding:9px 16px;background:#fff;color:var(--ink);box-shadow:0 4px 14px rgba(47,51,73,.09);cursor:pointer;font-weight:700;font-size:13px;transition:.15s;white-space:nowrap;}
-button:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(47,51,73,.13);}
-button.active{background:var(--ink);color:#fff;}
-.panel{display:none;}.panel.active{display:block;animation:fade .2s ease;}
-@keyframes fade{from{opacity:.3;transform:translateY(5px)}to{opacity:1;transform:none}}
-
-/* GRID */
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;}
-.card{background:rgba(255,250,242,.92);border:1px solid rgba(232,223,209,.95);border-radius:var(--round);box-shadow:var(--shadow);padding:18px;}
-.span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}
-.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}
-h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
-.hint{color:var(--muted);font-size:13px;margin:0 0 12px;}
-.tiny{font-size:12px;color:var(--muted);}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
-
-/* ROLE BAR */
-.role-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
-.role-btn{border:0;border-radius:999px;padding:7px 16px;background:#fff;border:1.5px solid var(--line);color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;transition:.15s;display:flex;align-items:center;gap:6px;}
-.role-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
-
-/* WHEEL SVG */
-.wheel-wrap{display:flex;justify-content:center;align-items:center;padding:8px 0;}
-#wheelSvg{width:min(88vw,520px);height:min(88vw,520px);cursor:pointer;display:block;}
-
-/* SPECTRUM */
-.spectrum{display:grid;gap:8px;}
-.spec-row{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center;}
-.spec-level{font-size:11px;font-weight:700;color:var(--muted);}
-.spec-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.spec-chip{border-radius:14px;padding:8px 6px;text-align:center;font-weight:800;font-size:13px;cursor:pointer;background:var(--tone);min-height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.15s;border:1.5px solid transparent;}
-.spec-chip:hover{transform:translateY(-2px);border-color:rgba(47,51,73,.2);}
-.spec-chip small{display:block;font-size:11px;font-weight:600;opacity:.75;margin-top:2px;}
-.spec-chip .ctx-tip{display:none;font-size:11px;font-weight:500;line-height:1.4;margin-top:4px;opacity:.85;}
-.spec-chip:hover .ctx-tip{display:block;}
-
-/* CTX PANEL */
-.ctx-panel{margin-top:12px;padding:12px 14px;border-radius:16px;border-left:4px solid var(--tone-border,var(--line));background:rgba(255,255,255,.7);font-size:13px;line-height:1.7;}
-.ctx-row{margin-bottom:8px;}
-.ctx-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
-.ctx-quote{color:var(--ink);font-style:italic;}
-
-/* EMOTION CARDS */
-.emotion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px;}
-.emotion-card{position:relative;overflow:hidden;border:1px solid rgba(232,223,209,.95);border-radius:18px;background:#fff;padding:12px;min-height:120px;cursor:pointer;transition:.15s;}
-.emotion-card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(47,51,73,.11);}
-.emotion-card.selected{outline:3px solid rgba(47,51,73,.25);border-color:var(--ink);}
-.emotion-card::before{content:"";position:absolute;inset:0;background:var(--tone);opacity:.4;}
-.emotion-card>*{position:relative;}
-.ec-word{font-size:20px;font-weight:900;}
-.ec-en{font-size:11px;color:var(--muted);font-weight:700;}
-.ec-desc{font-size:12px;color:#55596a;margin-top:5px;}
-.ec-face{font-size:34px;line-height:1;margin-top:8px;}
-
-/* DRAW */
-.result-card{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:24px;background:rgba(255,255,255,.85);border:1px dashed #dacdbb;padding:16px;}
-.bigface{font-size:80px;line-height:1;}
-.bigword{font-size:36px;font-weight:900;margin:8px 0;}
-.prompt{font-size:15px;color:#55596a;line-height:1.6;}
-.draw-ctx{margin-top:12px;font-size:13px;font-style:italic;color:var(--muted);max-width:380px;}
-
-/* MINE */
-.selected-list{display:flex;flex-wrap:wrap;gap:8px;min-height:42px;}
-.pill{border-radius:999px;background:#fff;border:1px solid var(--line);padding:6px 12px;font-weight:800;font-size:14px;cursor:pointer;}
-.pill:hover{background:#ffeedd;}
-
-/* SORT */
-.sort-board{display:flex;gap:10px;overflow:auto;padding-bottom:10px;}
-.slot{min-width:160px;min-height:145px;border:2px dashed #d6c8b8;border-radius:18px;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:var(--muted);font-weight:800;flex-shrink:0;}
-.slot.filled{border-style:solid;color:var(--ink);background:#fff;}
-
-/* QUAD */
-.quadrant{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.quad{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:180px;padding:12px;}
-.quad h3{display:flex;justify-content:space-between;font-size:14px;}
-.dropzone{display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;min-height:110px;margin-top:8px;}
-
-/* CHARACTERS */
-.char-strip{display:flex;gap:8px;flex-wrap:wrap;}
-.char-item{display:grid;grid-template-columns:40px 1fr;gap:8px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:16px;padding:8px 12px;cursor:pointer;min-width:140px;transition:.15s;}
-.char-item.active{background:var(--ink);color:#fff;}
-.char-avatar{font-size:30px;text-align:center;}
-
-/* SEARCH */
-.search-input{width:100%;border:1px solid var(--line);border-radius:16px;padding:11px 14px;font-size:15px;background:#fff;color:var(--ink);outline:none;}
-.search-input:focus{border-color:rgba(47,51,73,.3);}
-
-/* FILTER CHIPS */
-.fchip{border:0;border-radius:999px;padding:7px 13px;background:rgba(255,255,255,.7);border:1px solid rgba(232,223,209,.9);color:var(--ink);cursor:pointer;font-size:12px;font-weight:700;transition:.15s;}
-.fchip.active{background:var(--ink);color:#fff;}
-
-/* BLEND */
-.blend-row{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);}
-.blend-label{font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:700;}
-.blend-chips{display:flex;gap:6px;flex-wrap:wrap;}
-.blend-chip{font-size:12px;padding:4px 10px;border-radius:12px;background:rgba(255,255,255,.7);color:var(--muted);border:1px solid var(--line);}
-
-/* MODAL */
-.modal{position:fixed;inset:0;background:rgba(47,51,73,.38);display:none;align-items:center;justify-content:center;z-index:40;padding:16px;}
-.modal.show{display:flex;}
-.modal .card{max-width:660px;max-height:84vh;overflow:auto;}
-.modal h3{margin:14px 0 6px;}
-.close-btn{float:right;font-size:20px;background:transparent;box-shadow:none;padding:4px 8px;}
-
-/* MISC */
-.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;}
-.footer{margin-top:24px;color:var(--muted);font-size:12px;text-align:center;}
-.copy-badge{display:inline-block;font-size:11px;background:var(--ink);color:#fff;padding:2px 8px;border-radius:8px;margin-left:6px;opacity:0;transition:opacity .2s;}
-.copy-badge.show{opacity:1;}
-/* TOAST */
-#addToast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:13px;font-weight:700;padding:10px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(47,51,73,.25);opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;z-index:99;white-space:nowrap;}
-#addToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-/* NAV BADGE */
-.nav-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#e05050;color:#fff;font-size:10px;font-weight:800;margin-left:4px;vertical-align:middle;line-height:1;}
-/* WHEEL SELECTED */
-.wheel-selected{stroke:#2f3349;stroke-width:3;filter:brightness(.9);}
-/* ROLE HINT */
-.role-hint{font-size:11px;color:var(--muted);margin-bottom:12px;padding:6px 10px;background:rgba(255,255,255,.6);border-radius:10px;border:1px solid var(--line);}
-/* ONBOARDING TIP */
-.tip-bubble{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;padding:8px 14px;border-radius:12px;white-space:nowrap;z-index:20;pointer-events:none;animation:tipfade 4s ease forwards;}
-.tip-bubble::before{content:"";position:absolute;top:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-bottom-color:var(--ink);border-top:none;}
-@keyframes tipfade{0%{opacity:0;transform:translateX(-50%) translateY(4px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}80%{opacity:1}100%{opacity:0}}
-/* SORT REFERENCE */
-.sort-ref{font-size:12px;color:var(--muted);margin-top:8px;padding:8px 12px;background:rgba(255,255,255,.7);border-radius:12px;border:1px dashed var(--line);}
-
-@media(max-width:850px){
-  .grid{grid-template-columns:1fr;}
-  .span4,.span5,.span6,.span7,.span8,.span12{grid-column:span 1;}
-  .hero{display:block;}
-  .hbtns{justify-content:flex-start;margin-top:10px;}
-  .spec-row{grid-template-columns:1fr;}
-  .spec-bar{grid-template-columns:1fr 1fr;}
-  .quadrant{grid-template-columns:1fr;}
-  .bigface{font-size:64px;}
-  .bigword{font-size:28px;}
-}
-@media print{
-  header,nav,.toolbar,.footer,.role-bar,.hbtns{display:none;}
-  .panel{display:block!important;}
-  .card{box-shadow:none;break-inside:avoid;}
-  body{background:#fff;}
-}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at top,#fff8e8 0,#f7f3ec 45%,#efe7d7 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;line-height:1.55}.app{max-width:1180px;margin:auto;padding:18px 16px 90px}header{position:sticky;top:0;z-index:30;margin:-18px -16px 16px;padding:12px 16px;background:rgba(247,243,236,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(232,223,209,.78)}.hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-end}h1{font-size:clamp(22px,4vw,38px);margin:0;letter-spacing:.02em}.subtitle{margin:2px 0 0;color:var(--muted);font-size:14px}.hbtns,.toolbar,.chips{display:flex;gap:8px;flex-wrap:wrap}.hbtns{justify-content:flex-end}button,.btn{border:0;border-radius:999px;padding:9px 15px;background:#fff;color:var(--ink);box-shadow:0 5px 15px rgba(47,51,73,.08);cursor:pointer;font-weight:800;font-size:13px;white-space:nowrap;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:5px}button:hover,.btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(47,51,73,.13)}button.primary{background:var(--ink);color:#fff}button.ghost{background:rgba(255,255,255,.7);border:1px solid var(--line);box-shadow:none}.danger{color:#b23a48}nav{display:flex;gap:8px;overflow:auto;padding:8px 0 2px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{border:1px solid rgba(232,223,209,.9);box-shadow:none;background:rgba(255,255,255,.68)}nav button.active{background:var(--ink);color:#fff;border-color:var(--ink)}.panel{display:none}.panel.active{display:block;animation:fade .2s ease}@keyframes fade{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:none}}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:rgba(255,250,242,.94);border:1px solid rgba(232,223,209,.95);border-radius:var(--round);box-shadow:var(--shadow);padding:18px;position:relative;overflow:hidden}.span3{grid-column:span 3}.span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}.span9{grid-column:span 9}.span12{grid-column:span 12}h2{font-size:21px;margin:0 0 6px}h3{font-size:16px;margin:0 0 8px}.hint{color:var(--muted);font-size:13px;margin:0 0 12px}.tiny{font-size:12px;color:var(--muted)}.modebar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.modebar button.active,.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}.home-title{font-size:clamp(28px,5vw,56px);line-height:1.1;margin:8px 0;color:#2b2f45}.home-sub{font-size:16px;color:#5e6277;max-width:650px}.bigcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px}.bigcard{border:1px solid rgba(232,223,209,.9);border-radius:24px;background:#fff;padding:16px;min-height:150px;cursor:pointer;transition:.16s;position:relative;overflow:hidden}.bigcard:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(47,51,73,.14)}.bigcard::after{content:"";position:absolute;inset:0;background:var(--tone);opacity:.36}.bigcard>*{position:relative}.big-emoji{font-size:44px;line-height:1}.big-word{font-size:24px;font-weight:950;margin-top:5px}.big-plain{color:#5a6074;font-weight:700;font-size:13px}.stepper{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:0 0 14px}.step{background:rgba(255,255,255,.68);border:1px solid var(--line);border-radius:16px;padding:9px;text-align:center;font-size:12px;font-weight:900;color:var(--muted)}.step.done{background:#fff;color:var(--ink);border-color:rgba(47,51,73,.2)}.wheel-wrap{display:flex;align-items:center;justify-content:center;min-height:410px}#wheelSvg{width:min(90vw,520px);height:min(90vw,520px);display:block;cursor:pointer}.spectrum{display:grid;gap:9px}.spec-row{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:stretch}.spec-level{font-size:12px;font-weight:900;color:var(--muted);display:flex;align-items:center}.spec-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:7px}.spec-chip,.chip{border-radius:16px;border:1px solid rgba(47,51,73,.06);background:var(--tone,#fff);padding:9px 8px;text-align:center;cursor:pointer;transition:.15s;font-weight:900}.spec-chip small{display:block;color:#575b6b;font-weight:700;font-size:11px;margin-top:2px}.spec-chip:hover,.chip:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(47,51,73,.1)}.spec-chip.selected,.chip.selected{outline:3px solid rgba(47,51,73,.28)}.chip{background:#fff;border:1px solid var(--line);font-size:13px;box-shadow:none}.emotion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}.emotion-card{border:1px solid var(--line);border-radius:18px;background:#fff;padding:12px;min-height:126px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}.emotion-card::before{content:"";position:absolute;inset:0;background:var(--tone);opacity:.32}.emotion-card>*{position:relative}.emotion-card:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(47,51,73,.11)}.emotion-card.selected{outline:3px solid rgba(47,51,73,.25)}.ec-word{font-size:20px;font-weight:950}.ec-en{font-size:11px;color:#666b7b;font-weight:800}.ec-desc{font-size:12px;color:#55596a;margin-top:5px}.ec-face{font-size:34px;line-height:1;margin-top:8px}.input,.textarea,select{width:100%;border:1px solid var(--line);border-radius:16px;padding:11px 13px;font-size:15px;background:#fff;color:var(--ink);outline:none;font-family:inherit}.textarea{min-height:96px;resize:vertical}.input:focus,.textarea:focus,select:focus{border-color:rgba(47,51,73,.35)}.selected-list{display:flex;gap:8px;flex-wrap:wrap;min-height:40px}.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:7px 12px;background:#fff;border:1px solid var(--line);font-weight:850;font-size:14px;cursor:pointer}.pill:hover{background:#fff3df}.poster{min-height:320px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-radius:24px;background:linear-gradient(145deg,#fff,#fff2db);border:1px dashed #dacdbb;padding:20px}.poster .face{font-size:74px;line-height:1}.poster .word{font-size:30px;font-weight:950;margin:10px 0}.poster .text{font-size:15px;color:#55596a;max-width:520px}.body-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.need-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.need{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;font-weight:850;cursor:pointer;text-align:center}.need.selected{background:var(--ink);color:#fff}.quad-switch{display:flex;gap:8px;margin-bottom:10px}.quadrant{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quad{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:165px;padding:12px}.quad h3{display:flex;justify-content:space-between;font-size:14px}.dropzone{display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;min-height:98px;margin-top:8px}.sort-board{display:flex;gap:10px;overflow:auto;padding-bottom:10px}.slot{min-width:160px;min-height:130px;border:2px dashed #d6c8b8;border-radius:18px;background:rgba(255,255,255,.62);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:var(--muted);font-weight:850;flex-shrink:0}.slot.filled{border-style:solid;color:var(--ink);background:#fff}.modal{position:fixed;inset:0;background:rgba(47,51,73,.38);display:none;align-items:center;justify-content:center;z-index:80;padding:16px}.modal.show{display:flex}.modal .card{max-width:760px;max-height:84vh;overflow:auto}.close-btn{float:right;background:transparent;box-shadow:none;padding:4px 8px;font-size:20px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:#fff;font-size:13px;font-weight:800;padding:10px 18px;border-radius:999px;box-shadow:0 8px 24px rgba(47,51,73,.25);opacity:0;transition:.22s;pointer-events:none;z-index:99}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px;background:rgba(255,255,255,.45)}.footer{margin-top:24px;color:var(--muted);font-size:12px;text-align:center}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:999px;background:#e05050;color:#fff;font-size:10px;font-weight:900;margin-left:4px;padding:0 5px}.checkin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}.student{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}.student .emoji{font-size:28px}.student .name{font-weight:900}.log-list{display:grid;gap:8px;max-height:360px;overflow:auto}.log-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 12px}.log-item b{font-size:14px}.log-item p{margin:4px 0 0;color:#656a7b;font-size:12px}.file-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:14px;background:#fff}.progress{height:9px;background:#eee5d7;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--ink);width:0}.print-only{display:none}@media(max-width:880px){.grid{grid-template-columns:1fr}.span3,.span4,.span5,.span6,.span7,.span8,.span9,.span12{grid-column:span 1}.hero{display:block}.hbtns{margin-top:10px;justify-content:flex-start}.stepper{grid-template-columns:repeat(3,1fr)}.spec-row{grid-template-columns:1fr}.quadrant{grid-template-columns:1fr}.wheel-wrap{min-height:330px}.poster .face{font-size:58px}.poster .word{font-size:24px}}@media print{header,.hbtns,nav,.modebar,.toolbar,.no-print,.modal{display:none!important}.panel{display:block!important}.card{box-shadow:none;break-inside:avoid}.print-only{display:block}body{background:#fff}.app{padding:0}}
 </style>
 </head>
 <body>
@@ -175,826 +24,315 @@ h2{font-size:20px;margin:0 0 6px;}h3{font-size:16px;margin:0 0 8px;}
   <div class="hero">
     <div>
       <h1>情緒輪光譜</h1>
-      <p class="subtitle">從「我怪怪的」開始，慢慢找到比較準確的感受。</p>
+      <p class="subtitle">孩子與大人一起說出感受：看見感覺 → 命名感覺 → 找強度 → 說需求。</p>
     </div>
     <div class="hbtns">
       <button id="installBtn">加入桌面</button>
-      <button onclick="document.getElementById('manual').classList.add('show')">使用說明</button>
+      <button onclick="openManual()">使用說明</button>
       <button onclick="window.print()">列印</button>
     </div>
   </div>
-  <nav id="tabs">
-    <button class="active" data-tab="wheel">情緒輪</button>
-    <button data-tab="explore">探索</button>
-    <button data-tab="draw">抽選</button>
-    <button data-tab="mine">我的感受<span class="nav-badge" id="mineBadge" style="display:none;">0</span></button>
-    <button data-tab="sort">光譜排序</button>
-    <button data-tab="quad">四象限</button>
-    <button data-tab="settings">角色設定</button>
-  </nav>
+  <nav id="tabs"></nav>
 </header>
 
+<div class="toast" id="toast">已更新</div>
+
 <main>
-<div id="addToast">✓ 已加入我的感受</div>
+  <div class="modebar no-print" id="modeBar"></div>
 
-<!-- 角色視角列（全域） -->
-<div style="position:relative;">
-  <div class="role-bar" id="globalRoleBar"></div>
-  <div class="role-hint">切換視角後，情緒輪右側的「情境說明」會跟著改變，協助不同年齡或使用情境對應。</div>
-</div>
+  <section id="home" class="panel active">
+    <div class="grid">
+      <div class="card span8">
+        <div class="stepper">
+          <div class="step done">1 看見</div><div class="step">2 身體</div><div class="step">3 命名</div><div class="step">4 強度</div><div class="step">5 需求</div><div class="step">6 下一步</div>
+        </div>
+        <div class="home-title">今天你怎麼了？</div>
+        <p class="home-sub">不用一次說清楚。可以先從「怪怪的、空空的、不想說」開始，再慢慢找到比較接近的情緒。</p>
+        <div class="bigcards" id="homeCards"></div>
+      </div>
+      <div class="card span4">
+        <h2>安全出口</h2>
+        <p class="hint">孩子不一定要選對，先讓他保有「不知道」的空間。</p>
+        <div class="chips">
+          <button class="ghost" onclick="quickSelectSpecial('不知道')">我不知道</button>
+          <button class="ghost" onclick="quickSelectSpecial('不想說')">我現在不想說</button>
+          <button class="ghost" onclick="quickSelectSpecial('空空的')">我現在空空的</button>
+          <button class="ghost" onclick="goTab('custom')">自己寫一個</button>
+        </div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+        <h3>這版重點</h3>
+        <p class="hint">加入幼兒／親子／課堂／輔導／成人模式、身體感覺、需求表達、事件反思卡、情緒紀錄與完整 PWA 部署檔。</p>
+      </div>
+    </div>
+  </section>
 
-<!-- ① 情緒輪 -->
-<section id="wheel" class="panel active">
-  <div class="grid">
-    <div class="card span7">
-      <h2>情緒輪：先找大方向</h2>
-      <p class="hint">點扇形選一個核心情緒，右側會出現由輕到強的光譜詞彙。</p>
-      <div class="wheel-wrap">
-        <svg id="wheelSvg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+  <section id="wheel" class="panel">
+    <div class="grid">
+      <div class="card span7">
+        <h2>情緒輪：先找大方向</h2>
+        <p class="hint">幼兒模式會簡化；其他模式可看完整八大情緒。點扇形後，右側顯示由小到大的光譜。</p>
+        <div class="wheel-wrap"><svg id="wheelSvg" viewBox="0 0 500 500" aria-label="情緒輪"></svg></div>
+      </div>
+      <div class="card span5" id="spectrumCard">
+        <h2 id="spectrumTitle">選一種核心情緒</h2>
+        <p class="hint" id="spectrumHint">點情緒詞可加入「我的感受」。</p>
+        <div id="spectrum" class="spectrum"></div>
+        <div id="contextBox" style="margin-top:12px"></div>
       </div>
     </div>
-    <div class="card span5" id="spectrumCard">
-      <h2 id="spectrumTitle">選一種核心情緒</h2>
-      <p class="hint" id="spectrumHint">每排代表一種強度，點詞彙可加入「我的感受」。</p>
-      <div id="spectrum" class="spectrum"></div>
-      <div class="blend-row" id="blendRow" style="display:none;">
-        <div class="blend-label">混合情緒</div>
-        <div class="blend-chips" id="blendChips"></div>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- ② 探索 -->
-<section id="explore" class="panel">
-  <div class="grid">
-    <div class="card span12">
-      <h2>探索情緒詞</h2>
-      <p class="hint">搜尋或用核心情緒篩選。點卡片加入「我的感受」。</p>
-      <input id="searchInput" class="search-input" placeholder="搜尋：生氣、失望、期待、安心……"/>
-      <div class="toolbar" id="filterChips" style="margin-top:8px;"></div>
-      <div class="emotion-grid" id="emotionGrid"></div>
+  <section id="body" class="panel">
+    <div class="grid">
+      <div class="card span7">
+        <h2>身體在哪裡告訴你？</h2>
+        <p class="hint">先注意身體，比直接問「你到底怎麼了」更溫和。</p>
+        <div class="body-map" id="bodyMap"></div>
+      </div>
+      <div class="card span5">
+        <h2>身體訊號</h2>
+        <div class="selected-list" id="bodyList"><div class="empty">尚未選擇</div></div>
+        <div class="toolbar" style="margin-top:12px"><button onclick="state.body=[];renderBody();renderPoster();">清除身體感覺</button><button class="primary" onclick="goTab('wheel')">接著找情緒</button></div>
+        <p class="hint" style="margin-top:14px">範例：「我肚子怪怪的，可能是害怕，也可能是緊張。」</p>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ③ 抽選 -->
-<section id="draw" class="panel">
-  <div class="grid">
-    <div class="card span5">
-      <h2>抽一張情緒詞彙卡</h2>
-      <p class="hint">適合暖身、晨圈、親子對話或課堂提問。</p>
-      <div class="toolbar">
-        <button onclick="drawEmotion()">🎲 抽一個</button>
-        <button onclick="drawEmotion(true)">不重複抽</button>
-        <button onclick="resetDrawn()">重新開始</button>
+  <section id="mine" class="panel">
+    <div class="grid">
+      <div class="card span5">
+        <h2>我的感受卡</h2>
+        <p class="hint">可選多個情緒，因為人常常不是只有一種感覺。</p>
+        <div class="selected-list" id="selectedList"><div class="empty">尚未選擇情緒</div></div>
+        <label class="tiny">剛剛發生什麼事？</label>
+        <textarea id="eventText" class="textarea" placeholder="例如：玩具被拿走、被催、想睡但還不想睡……"></textarea>
+        <label class="tiny">我真正需要</label>
+        <div class="need-grid" id="needGrid"></div>
+        <label class="tiny">下一步我可以</label>
+        <div class="need-grid" id="actionGrid"></div>
+        <div class="toolbar" style="margin-top:12px"><button onclick="clearSelected()">清除</button><button onclick="saveLog()">存入紀錄</button><button class="primary" onclick="savePoster()">儲存圖片</button></div>
       </div>
-      <div class="char-strip" id="drawCharacters" style="margin-top:8px;"></div>
-    </div>
-    <div class="card span7">
-      <div class="result-card" id="drawResult">
-        <div class="bigface">🎲</div>
-        <div class="bigword">還沒抽</div>
-        <p class="prompt">按上方按鈕，看看今天遇到哪一種感受。</p>
+      <div class="card span7">
+        <h2>舉牌模式</h2>
+        <div class="poster" id="poster">
+          <div class="face" id="posterFace">🙂</div>
+          <div class="word" id="posterTitle">我現在有一點感覺</div>
+          <div class="text" id="posterText">可以慢慢說，不用一次說清楚。</div>
+        </div>
+        <canvas id="posterCanvas" width="1200" height="900" style="display:none"></canvas>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ④ 我的感受 -->
-<section id="mine" class="panel">
-  <div class="grid">
-    <div class="card span5">
-      <h2>我現在的感受</h2>
-      <p class="hint">可以一次選很多個。孩子常常不是只有一種感覺，大人也是。</p>
-      <div class="selected-list" id="selectedList"><div class="empty">尚未選擇情緒</div></div>
-      <div class="toolbar">
-        <button onclick="clearSelected()">清除</button>
-        <button onclick="saveFeelingCard()">儲存為圖片</button>
+  <section id="explore" class="panel">
+    <div class="grid">
+      <div class="card span12">
+        <h2>探索情緒詞</h2>
+        <p class="hint">搜尋、篩選、加入我的感受。模式不同，會顯示不同詞彙難度。</p>
+        <input class="input" id="searchInput" placeholder="搜尋：生氣、失望、期待、安心……" />
+        <div class="toolbar" id="filterChips" style="margin-top:10px"></div>
+        <div class="emotion-grid" id="emotionGrid"></div>
       </div>
-      <label class="tiny" style="display:block;margin-bottom:4px;">為什麼會有這些感受？</label>
-      <textarea id="reason" class="search-input" style="min-height:110px;resize:vertical;border-radius:16px;" placeholder="例如：今天被催、玩具被拿走、想睡但還不想睡……"></textarea>
     </div>
-    <div class="card span7">
-      <h2>舉牌模式</h2>
-      <div class="result-card" id="feelingPoster">
-        <div class="bigface" id="posterFace">🙂</div>
-        <div class="bigword" id="posterText">我現在有一點感覺</div>
-        <p class="prompt" id="posterSub">可以慢慢說，不用一次說清楚。</p>
-      </div>
-      <canvas id="posterCanvas" width="1200" height="900" style="display:none;"></canvas>
-    </div>
-  </div>
-</section>
+  </section>
 
-<!-- ⑤ 光譜排序 -->
-<section id="sort" class="panel">
-  <div class="grid">
-    <div class="card span12">
-      <h2>光譜排序</h2>
-      <p class="hint">把情緒從「比較小」排到「比較大」。適合討論情緒有大小，不是只有「沒事」和「爆炸」。</p>
-      <div class="sort-board" id="sortBoard"></div>
-      <div class="toolbar">
-        <button onclick="newSortGame()">換一組</button>
-        <button onclick="clearSort()">清除重排</button>
-        <button onclick="showSortRef()">查看參考排序</button>
+  <section id="draw" class="panel">
+    <div class="grid">
+      <div class="card span5">
+        <h2>抽一張情緒卡</h2>
+        <p class="hint">適合晨圈、睡前對話、課堂暖場。</p>
+        <div class="toolbar"><button onclick="drawEmotion(false)">🎲 抽一個</button><button onclick="drawEmotion(true)">不重複抽</button><button onclick="state.drawn=[];renderDrawBlank()">重來</button></div>
       </div>
-      <div class="sort-ref" id="sortRef" style="display:none;"></div>
-      <div class="emotion-grid" id="sortPool"></div>
+      <div class="card span7"><div class="poster" id="drawResult"></div></div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ⑥ 四象限 -->
-<section id="quad" class="panel">
-  <div class="grid">
-    <div class="card span12">
-      <h2>四象限：身體能量 × 感受舒服度</h2>
-      <p class="hint">引導孩子理解：不舒服不一定都是生氣，安靜也可能是難過或平靜。</p>
-      <div class="quadrant">
-        <div class="quad" data-q="highGood"><h3>高能量・舒服 <span>⚡🙂</span></h3><div class="dropzone" id="dz-highGood"></div></div>
-        <div class="quad" data-q="highHard"><h3>高能量・不舒服 <span>⚡🙁</span></h3><div class="dropzone" id="dz-highHard"></div></div>
-        <div class="quad" data-q="lowGood"><h3>低能量・舒服 <span>🌙🙂</span></h3><div class="dropzone" id="dz-lowGood"></div></div>
-        <div class="quad" data-q="lowHard"><h3>低能量・不舒服 <span>🌧️🙁</span></h3><div class="dropzone" id="dz-lowHard"></div></div>
-      </div>
-      <div class="toolbar">
-        <button onclick="autoFillQuad()">示範分類</button>
-        <button onclick="clearQuad()">清除</button>
+  <section id="sort" class="panel">
+    <div class="grid">
+      <div class="card span12">
+        <h2>光譜排序</h2>
+        <p class="hint">把情緒由小到大排序。沒有唯一標準答案，重點是說出理由。</p>
+        <div class="sort-board" id="sortBoard"></div>
+        <div class="toolbar"><button onclick="newSortGame()">換一組</button><button onclick="clearSort()">清除重排</button><button onclick="showSortRef()">查看參考排序</button></div>
+        <div id="sortRef" class="empty" style="display:none;margin-bottom:10px"></div>
+        <div class="emotion-grid" id="sortPool"></div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ⑦ 角色設定 -->
-<section id="settings" class="panel">
-  <div class="grid">
-    <div class="card span6">
-      <h2>表情角色</h2>
-      <p class="hint">切換後，所有頁面的表情會一起更新。</p>
-      <div class="char-strip" id="characters"></div>
-    </div>
-    <div class="card span6">
-      <h2>語境角色視角</h2>
-      <p class="hint">切換後，情緒輪的「情境說明」會改變。職場人偏壓抑邏輯、孩童直白具象、文學角色帶有隱喻張力。</p>
-      <div class="role-bar" id="settingsRoleBar"></div>
-      <div class="toolbar" style="margin-top:16px;">
-        <button onclick="exportSettings()">複製設定</button>
-        <button onclick="resetAll()">恢復預設</button>
+  <section id="quad" class="panel">
+    <div class="grid">
+      <div class="card span12">
+        <h2>四象限</h2>
+        <p class="hint">兒童版：身體能量 × 舒服度。成人版：舒服度 × 掌控感。</p>
+        <div class="quad-switch"><button class="active" id="quadChildBtn" onclick="setQuadMode('child')">兒童版</button><button id="quadAdultBtn" onclick="setQuadMode('adult')">成人版</button></div>
+        <div class="quadrant" id="quadGrid"></div>
+        <div class="toolbar"><button onclick="autoFillQuad()">示範分類</button><button onclick="clearQuad()">清除</button></div>
       </div>
-      <pre id="settingsOutput" style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;min-height:100px;color:#55596a;font-size:12px;margin-top:10px;"></pre>
     </div>
-  </div>
-</section>
+  </section>
 
+  <section id="classroom" class="panel">
+    <div class="grid">
+      <div class="card span5">
+        <h2>課堂／晨圈模式</h2>
+        <p class="hint">輸入學生暱稱，快速做情緒簽到。資料只存在此裝置。</p>
+        <textarea id="studentNames" class="textarea" placeholder="每行一位：\n小安\n小樂\n小晴"></textarea>
+        <div class="toolbar"><button onclick="buildCheckin()">建立名單</button><button onclick="clearCheckin()">清除</button></div>
+      </div>
+      <div class="card span7">
+        <h2>今日簽到</h2>
+        <div class="checkin-grid" id="checkinGrid"><div class="empty">尚未建立名單</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="log" class="panel">
+    <div class="grid">
+      <div class="card span5">
+        <h2>情緒紀錄</h2>
+        <p class="hint">記錄「情緒軌跡」，不是拿來評分。資料預設存在 localStorage。</p>
+        <div class="progress"><span id="logProgress"></span></div>
+        <p class="tiny" id="logSummary" style="margin:8px 0 12px">尚無紀錄</p>
+        <div class="toolbar"><button onclick="exportLogs()">匯出 JSON</button><button onclick="downloadLogsCsv()">匯出 CSV</button><button class="danger" onclick="clearLogs()">清除紀錄</button></div>
+      </div>
+      <div class="card span7"><div class="log-list" id="logList"></div></div>
+    </div>
+  </section>
+
+  <section id="custom" class="panel">
+    <div class="grid">
+      <div class="card span6">
+        <h2>自己寫一個感覺</h2>
+        <p class="hint">保留「其他情緒」空間，讓家庭語言、方言、孩子自己的說法可以被放進來。</p>
+        <input class="input" id="customWord" placeholder="例如：悶悶、卡卡、想躲起來、心裡轉轉轉" />
+        <textarea class="textarea" id="customDesc" placeholder="這個感覺像什麼？身體哪裡有感覺？"></textarea>
+        <div class="toolbar"><button class="primary" onclick="addCustomEmotion()">加入我的感受</button></div>
+      </div>
+      <div class="card span6">
+        <h2>管理者設定</h2>
+        <p class="hint">這裡先提供 MVP 版設定匯出。下一版可擴充成詞庫編輯器。</p>
+        <div class="file-row"><span>目前版本</span><b>v6.0</b></div>
+        <div class="file-row"><span>PWA manifest</span><b>manifest.json</b></div>
+        <div class="file-row"><span>Service worker</span><b>sw.js</b></div>
+        <div class="toolbar" style="margin-top:12px"><button onclick="exportSettings()">複製設定</button><button onclick="resetAll()">恢復預設</button></div>
+        <pre id="settingsOutput" style="white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;min-height:100px;color:#55596a;font-size:12px"></pre>
+      </div>
+    </div>
+  </section>
 </main>
-<p class="footer">情緒輪光譜 v3｜SEL 情緒詞彙工具｜可作為親子對話、班級活動、個別輔導與情緒詞彙教學使用。</p>
+<p class="footer">情緒輪光譜 v6｜不是要孩子立刻冷靜，而是先幫他把感覺說出來。</p>
 </div>
 
-<!-- 教師手冊 Modal -->
 <div class="modal" id="manual">
-  <div class="card" style="max-width:680px;">
-    <button class="close-btn" onclick="document.getElementById('manual').classList.remove('show')">✕</button>
-    <h2>📖 使用說明</h2>
-    <h3>🌀 情緒輪</h3>
-      <p>點輪盤上的核心情緒，右側顯示由輕到強的詞彙光譜。頂部三種語境角色可隨時切換，同一情緒在不同情境有不同表現。</p>
-      <h3>🎲 抽選</h3>
-      <p>隨機抽出一個情緒詞，附引導提問。適合課堂暖場、晨圈分享、親子睡前對話。抽到後可問：「什麼時候會有這種感受？」</p>
-      <h3>💗 我的感受</h3>
-      <p>可一次選多個情緒，允許複選。選完後可在下方寫下原因，或點「儲存為圖片」帶走。</p>
-      <h3>📋 光譜排序</h3>
-      <p>把情緒從「一點點」排到「很強烈」，幫助孩子理解情緒有大小，建立自我覺察與求助語言。</p>
-      <h3>🔲 四象限</h3>
-      <p>依「身體能量」和「感受舒適度」將情緒分類，幫助孩子觀察身體線索。安靜不一定平靜，激動不一定是壞事。</p>
-      <h3>👥 語境角色</h3>
-      <p><strong>👨‍💼 職場人</strong>：偏社會化壓抑表達，適合青少年與成人<br>
-      <strong>🧒 孩童</strong>：直白放大具象化，適合低年齡引導與親子對話<br>
-      <strong>🎭 文學角色</strong>：帶隱喻張力，適合創作課與情緒書寫</p>
-      <h3>📱 安裝到手機桌面</h3>
-      <p>iPhone/Safari：下方工具列 → 分享 → 加入主畫面<br>Android/Chrome：右上角選單 → 安裝應用程式</p>
+  <div class="card">
+    <button class="close-btn" onclick="closeManual()">✕</button>
+    <h2>使用說明</h2>
+    <h3>建議流程</h3>
+    <p>先從首頁選「今天你怎麼了」，再依序看身體感覺、情緒輪、光譜強度，最後用「我的感受卡」說出需要與下一步。</p>
+    <h3>模式差異</h3>
+    <p><b>幼兒</b>：四大情緒與口語詞。<b>親子</b>：需求表達與感受卡。<b>課堂</b>：晨圈、抽選、排序。<b>輔導</b>：身體訊號、事件反思。<b>成人</b>：完整詞庫與掌控感象限。</p>
+    <h3>大人陪伴句</h3>
+    <p>「你不用馬上說清楚，我先陪你。」、「這個感覺不是壞掉，是身體在提醒你。」、「等你準備好了，我們再一起想下一步。」</p>
+    <h3>安裝到桌面</h3>
+    <p>iPhone/Safari：分享 → 加入主畫面。Android/Chrome：右上角選單 → 安裝應用程式。</p>
   </div>
 </div>
 
 <script>
-/* =========================================================
-   DATA
-   ========================================================= */
+'use strict';
+const APP_VERSION = 'v6.0';
+const tabs = [
+  ['home','今天'],['body','身體'],['wheel','情緒輪'],['mine','我的感受'],['explore','探索'],['draw','抽選'],['sort','排序'],['quad','四象限'],['classroom','課堂'],['log','紀錄'],['custom','設定']
+];
+const modes = {
+  toddler:{label:'幼兒模式', hint:'四大情緒、低文字量', maxLevel:1, families:['joy','anger','fear','sad','calm']},
+  parent:{label:'親子模式', hint:'需求表達、感受卡', maxLevel:2, families:['joy','trust','fear','sad','anger','calm']},
+  classroom:{label:'課堂模式', hint:'晨圈、排序、活動', maxLevel:2, families:['joy','trust','fear','surprise','sad','disgust','anger','anticipation','calm']},
+  counsel:{label:'輔導模式', hint:'身體、事件、多重情緒', maxLevel:3, families:['joy','trust','fear','surprise','sad','disgust','anger','anticipation','calm']},
+  adult:{label:'成人模式', hint:'完整詞庫、掌控感', maxLevel:4, families:['joy','trust','fear','surprise','sad','disgust','anger','anticipation','calm']}
+};
 const families = [
-  {key:'joy',      name:'開心',   color:'var(--joy)',          hex:'#ffd166', angle:22,  hint:'舒服、亮亮的、想靠近',        blends:['愛（開心＋安心）','樂觀（開心＋期待）']},
-  {key:'trust',    name:'安心',   color:'var(--trust)',        hex:'#95d5b2', angle:67,  hint:'安全、放心、被接住',          blends:['愛（開心＋安心）','臣服（安心＋害怕）']},
-  {key:'fear',     name:'害怕',   color:'var(--fear)',         hex:'#bdb2ff', angle:112, hint:'擔心、想躲、需要保護',        blends:['臣服（安心＋害怕）','敬畏（害怕＋驚訝）']},
-  {key:'surprise', name:'驚訝',   color:'var(--surprise)',     hex:'#9bf6ff', angle:157, hint:'突然、沒想到、需要反應',      blends:['敬畏（害怕＋驚訝）','失望（難過＋驚訝）']},
-  {key:'sad',      name:'難過',   color:'var(--sad)',          hex:'#a0c4ff', angle:202, hint:'失落、想哭、需要陪伴',        blends:['失望（難過＋驚訝）','悔恨（難過＋討厭）']},
-  {key:'disgust',  name:'討厭',   color:'var(--disgust)',      hex:'#caffbf', angle:247, hint:'排斥、不想靠近、不舒服',      blends:['悔恨（難過＋討厭）','輕蔑（討厭＋生氣）']},
-  {key:'anger',    name:'生氣',   color:'var(--anger)',        hex:'#ffadad', angle:292, hint:'被打擾、被侵犯、想保護界線',  blends:['輕蔑（討厭＋生氣）','進取（生氣＋期待）']},
-  {key:'anticipation',name:'期待',color:'var(--anticipation)', hex:'#ffc6a8', angle:337, hint:'想知道、等不及、準備靠近',    blends:['樂觀（開心＋期待）','進取（生氣＋期待）']},
+  {key:'joy', name:'快樂', plain:'心裡亮亮的', color:'var(--joy)', hex:'#ffe45c', emoji:'😄', core:true},
+  {key:'trust', name:'安心', plain:'覺得被接住', color:'var(--trust)', hex:'#87e3b5', emoji:'😌'},
+  {key:'fear', name:'害怕', plain:'想躲起來', color:'var(--fear)', hex:'#c9b6ff', emoji:'😟', core:true},
+  {key:'surprise', name:'驚訝', plain:'沒想到', color:'var(--surprise)', hex:'#74e6ea', emoji:'😮'},
+  {key:'sad', name:'難過', plain:'心裡重重的', color:'var(--sad)', hex:'#91c9ff', emoji:'😢', core:true},
+  {key:'disgust', name:'討厭', plain:'不想靠近', color:'var(--disgust)', hex:'#b5f79b', emoji:'😖'},
+  {key:'anger', name:'生氣', plain:'想大聲說不要', color:'var(--anger)', hex:'#ff9fa3', emoji:'😠', core:true},
+  {key:'anticipation', name:'期待', plain:'很想知道', color:'var(--anticipation)', hex:'#ffbd7b', emoji:'🤩'},
+  {key:'calm', name:'平靜', plain:'身體剛剛好', color:'var(--calm)', hex:'#d8e2dc', emoji:'🙂', core:true}
 ];
-
 const levels = ['一點點','有一些','很明顯','很強烈'];
-
-/* 情緒詞庫 [family, word, en, desc, quad] */
 const rawEmotions = [
-  ['joy','愉快','content','心裡亮亮的','highGood'],
-  ['joy','舒暢','pleasant','有種輕盈的感覺','highGood'],
-  ['joy','開心','glad','覺得事情很好','highGood'],
-  ['joy','快樂','happy','想跟大家分享','highGood'],
-  ['joy','興奮','excited','很想跳起來','highGood'],
-  ['joy','雀躍','elated','停不下來的開心','highGood'],
-  ['joy','欣喜','delighted','好像被光照到','highGood'],
-  ['joy','狂喜','ecstatic','好像快裝不下','highGood'],
-  ['trust','接受','accepting','願意讓它存在','lowGood'],
-  ['trust','寬容','tolerant','不介意不一樣','lowGood'],
-  ['trust','放心','relieved','不用一直擔心','lowGood'],
-  ['trust','安心','safe','覺得被保護','lowGood'],
-  ['trust','信任','trusting','願意靠近別人','lowGood'],
-  ['trust','依賴','reliant','想靠著你','lowGood'],
-  ['trust','被接住','held','有人懂我','lowGood'],
-  ['trust','崇敬','admiration','心裡有你的位置','lowGood'],
-  ['fear','隱憂','unease','有點說不清','lowHard'],
-  ['fear','不安','uneasy','有點怪怪的','lowHard'],
-  ['fear','擔心','worried','怕事情不好','lowHard'],
-  ['fear','憂慮','anxious','停不下來的擔心','lowHard'],
-  ['fear','害怕','afraid','想躲起來','highHard'],
-  ['fear','恐懼','fearful','身體有反應了','highHard'],
-  ['fear','驚恐','terrified','身體很緊繃','highHard'],
-  ['fear','恐慌','panic','無法控制了','highHard'],
-  ['surprise','好奇','curious','想多知道一點','highGood'],
-  ['surprise','疑惑','puzzled','搞不清楚狀況','highGood'],
-  ['surprise','意外','surprised','跟想的不一樣','highGood'],
-  ['surprise','訝異','astonished','有點說不出話','highGood'],
-  ['surprise','震驚','shocked','一時說不出話','highHard'],
-  ['surprise','慌亂','flustered','不知道先做什麼','highHard'],
-  ['surprise','錯愕','stunned','整個人愣住了','highHard'],
-  ['surprise','目瞪口呆','dumbfounded','大腦暫時停機','highHard'],
-  ['sad','有點低落','blue','不太有精神','lowHard'],
-  ['sad','失落','down','覺得少了一塊','lowHard'],
-  ['sad','委屈','hurt','想被聽見','lowHard'],
-  ['sad','惆悵','wistful','說不清楚的悶','lowHard'],
-  ['sad','難過','sad','心裡重重的','lowHard'],
-  ['sad','悲傷','sorrowful','眼淚想出來','lowHard'],
-  ['sad','心碎','heartbroken','感覺裂開了','lowHard'],
-  ['sad','崩潰','devastated','很難自己整理','lowHard'],
-  ['disgust','有點不喜歡','dislike','不太想要','lowHard'],
-  ['disgust','乏味','bored','沒什麼興趣','lowHard'],
-  ['disgust','不屑','disdain','看不上眼','lowHard'],
-  ['disgust','厭煩','annoyed','一直被煩到','highHard'],
-  ['disgust','嫌棄','contempt','不想碰','highHard'],
-  ['disgust','排斥','repulsed','很想遠離','highHard'],
-  ['disgust','噁心','disgusted','生理反應了','highHard'],
-  ['disgust','受不了','fed up','已經滿出來了','highHard'],
-  ['anger','有點不爽','peeved','輕微被惹到','highHard'],
-  ['anger','不爽','irritated','覺得被卡住','highHard'],
-  ['anger','煩躁','frustrated','一直卡一直卡','highHard'],
-  ['anger','生氣','angry','界線被碰到','highHard'],
-  ['anger','氣憤','indignant','覺得不公平','highHard'],
-  ['anger','憤怒','furious','很想大聲說不','highHard'],
-  ['anger','盛怒','outraged','快壓不住了','highHard'],
-  ['anger','暴怒','enraged','身體像要爆開','highHard'],
-  ['anticipation','留意','attentive','開始注意到了','highGood'],
-  ['anticipation','想要','wanting','心裡有方向','highGood'],
-  ['anticipation','好奇心','interested','想靠近看看','highGood'],
-  ['anticipation','期待','hopeful','等著好事發生','highGood'],
-  ['anticipation','盼望','wishful','很希望成真','highGood'],
-  ['anticipation','緊張','nervous','又期待又怕','highHard'],
-  ['anticipation','渴望','eager','非常非常想要','highGood'],
-  ['anticipation','迫不及待','impatient','很想立刻開始','highGood'],
-  ['calm','空空的','numb','暫時說不出感覺','lowHard'],
-  ['calm','疲倦','tired','需要休息一下','lowHard'],
-  ['calm','沉靜','quiet','不想說話也ok','lowGood'],
-  ['calm','放鬆','relaxed','身體慢慢鬆開','lowGood'],
-  ['calm','平靜','calm','現在剛剛好','lowGood'],
-  ['calm','安穩','settled','不需要什麼了','lowGood'],
-  ['calm','舒適','comfortable','身心都在對的地方','lowGood'],
-  ['calm','自在','at ease','做自己就好','lowGood'],
+  ['joy','開心','心裡亮亮的','我覺得很好','highGood',1],['joy','愉快','心情輕輕的','有一點舒服的好心情','highGood',2],['joy','快樂','想笑、想分享','好事情讓我覺得很棒','highGood',2],['joy','雀躍','身體想跳起來','開心到有點停不下來','highGood',3],['joy','狂喜','快裝不下了','非常非常高興','highGood',4],
+  ['trust','放心','不用一直擔心','覺得事情可以交出去','lowGood',2],['trust','安心','被保護、被接住','我知道有人在','lowGood',1],['trust','信任','願意靠近','相信對方不會傷害我','lowGood',3],['trust','被理解','有人懂我','不用解釋很多也可以','lowGood',3],
+  ['fear','怕怕','想找大人','身體提醒我需要安全','lowHard',1],['fear','不安','怪怪的','好像哪裡不太對','lowHard',2],['fear','擔心','一直想會不會不好','腦袋停不下來','lowHard',2],['fear','害怕','想躲起來','我需要保護或陪伴','highHard',1],['fear','恐慌','身體快失控','很難自己冷靜下來','highHard',4],
+  ['surprise','好奇','想知道','想靠近看看','highGood',2],['surprise','意外','跟想的不一樣','突然發生了','highGood',2],['surprise','震驚','說不出話','超出我預期很多','highHard',3],['surprise','慌亂','不知道先做什麼','事情來得太快','highHard',3],
+  ['sad','難過','心裡重重的','想哭或想被陪著','lowHard',1],['sad','失落','少了一塊','想要的沒有發生','lowHard',2],['sad','委屈','想被聽見','覺得別人沒有懂我','lowHard',2],['sad','孤單','好像沒有人在','很想有人陪','lowHard',3],['sad','崩潰','撐不住了','需要大人幫忙整理','lowHard',4],
+  ['disgust','不喜歡','不想要','這不是我想靠近的','lowHard',1],['disgust','厭煩','一直被煩到','想把它推遠一點','highHard',2],['disgust','排斥','很想遠離','身體明顯說不要','highHard',3],['disgust','受不了','已經滿出來','我需要停下來','highHard',4],
+  ['anger','氣氣','想說不要','有東西不照我的想法','highHard',1],['anger','不爽','被卡住','覺得不公平或被打擾','highHard',2],['anger','生氣','界線被碰到','我想保護自己','highHard',1],['anger','憤怒','很想大聲說不','感覺很不公平','highHard',3],['anger','暴怒','像要爆炸','需要先安全停下來','highHard',4],
+  ['anticipation','想要','心裡有方向','我開始注意到了','highGood',1],['anticipation','期待','等著好事發生','想到就有一點亮','highGood',2],['anticipation','緊張','又期待又怕','我很在意結果','highHard',2],['anticipation','迫不及待','很想立刻開始','等待變得有點難','highGood',3],
+  ['calm','空空的','暫時說不出感覺','不是沒有感覺，是還沒找到字','lowHard',1],['calm','累累的','想休息','身體需要慢下來','lowHard',1],['calm','放鬆','身體軟軟的','緊繃慢慢鬆開','lowGood',1],['calm','平靜','剛剛好','現在不用多做什麼','lowGood',1],['calm','自在','做自己就好','不需要假裝','lowGood',2]
 ];
-const emotions = rawEmotions.map((e,i)=>({id:i,family:e[0],word:e[1],en:e[2],desc:e[3],quad:e[4],level:i%4}));
-
-/* 語境角色 */
-const roles = [
-  {id:'p', label:'👨‍💼 職場', name:'職場人', desc:'壓抑・委婉・邏輯化'},
-  {id:'k', label:'🧒 孩童', name:'純真孩童', desc:'直白・放大・具象化'},
-  {id:'d', label:'🎭 文學', name:'文學角色', desc:'張力強・帶隱喻'},
+const bodySignals = [
+  ['頭頭緊緊','頭部緊繃'],['眼睛想哭','眼眶熱熱'],['喉嚨卡卡','喉嚨卡住'],['胸口悶悶','胸口壓迫'],['肚子怪怪','胃部緊縮'],['手想打人','手握緊'],['腳想跑走','想逃離'],['全身軟軟','疲倦無力'],['呼吸短短','呼吸變快'],['腦袋空白','想不到話']
 ];
-
-/* 語境情境句 ctx[emotionFamily][roleId][level 0-3] */
+const needs = ['抱抱我','陪我一下','讓我安靜','幫我說清楚','聽我說完','不要罵我','讓我休息','給我選擇'];
+const actions = ['深呼吸三次','喝一口水','離開一下','再說一次','畫出來','找大人幫忙','抱抱自己','等一下再試'];
 const ctx = {
-  joy:{
-    p:['靠在椅背、喝口咖啡。「呼，終於告一段落了。」','腳步輕快、主動打招呼。「今天進度很順。」','眼神有光、分享好消息。「這個結果超出預期。」','用力握拳、與團隊擊掌。「我們拿下了！今晚我請客！」'],
-    k:['摸著小肚子、沉沉睡去。「好舒服喔……」','嘴角上揚、拉著大人手。「明天可以吃冰淇淋嗎？」','眼睛發亮、一直說話。「今天超好玩！你知道嗎！」','原地蹦跳、拍手大叫。「耶耶耶！要去迪士尼了！」'],
-    d:['嘴角帶一絲若有似無的笑。「歲月靜好，現世安穩。」','眼神溫柔、雙手交疊胸前。「彷彿指尖都流淌著幸福。」','仰頭閉眼感受陽光。「這一刻，所有事都是對的。」','張開雙臂擁抱整個世界。「這是命運最好的安排！」'],
-  },
-  trust:{
-    p:['保持禮貌距離、不評論。「我尊重大家的判斷。」','點頭確認、眼神穩定。「我支持這個方向。」','主動分享資訊、不藏著。「這個你也需要知道。」','直接授權、不再過問。「這件事就交給你了，我完全放心。」'],
-    k:['靜靜坐在旁邊做自己的事。「你在這裡就好了。」','牽著手走路、不說話也安全。「跟你在一起不怕。」','趴在大人身上打盹。「有你在我不擔心。」','緊緊抱住最信任的人。「你在就好了，什麼都好了。」'],
-    d:['靜靜陪伴、不打擾。「有些人，只需存在便足夠。」','含笑點頭、心中無波無瀾。「你說的，我都明白了。」','閉眼深呼吸、把一切交付出去。「我願意相信。」','俯首稱臣、以性命相托。「此生此世，惟君可信。」'],
-  },
-  fear:{
-    p:['頻繁確認細節。「這樣做真的OK嗎？」','深呼吸、說話速度放慢。「我再check一次流程。」','聲音微微顫抖、眼神迴避。「這個決定……我需要更多資訊。」','手心冒汗、說話卡住。「這個風險……我不確定自己有把握。」'],
-    k:['睡前悄悄說。「媽媽，明天還會來嗎？」','縮在角落、眼神警戒。「那裡有奇怪的聲音，我不要去。」','抱緊玩偶、腳步不動。「我……我不敢。」','躲到大人身後、死抓衣角。「那個人很可怕！不要讓他靠近！」'],
-    d:['望著窗外、若有所思。「心底始終懸著一絲不安。」','眉頭緊鎖、在門口徘徊。「這扇門背後，是什麼？」','渾身發冷、無處可逃的感覺。「黑暗從四面八方悄悄湧來。」','站在懸崖邊，腳無法動彈。「深淵在凝視我，我也在凝視它。」'],
-  },
-  surprise:{
-    p:['輕輕點頭、若有所思。「嗯，跟我想的不太一樣。」','眉毛上揚、放下手邊事。「哦？這倒沒預料到。」','停頓、重新確認一次。「等一下……這個數字是真的嗎？」','完全停住、重新整理思路。「這……完全超出我的預設。」'],
-    k:['托著腮想一下。「咦，這樣也可以喔。」','歪頭反覆確認。「真的嗎真的嗎？！」','嘴巴張開、說不出話。「哇……這從哪裡來的！」','張大眼睛、蹦起來。「什麼！！這是魔法嗎！！」'],
-    d:['靜靜抬眼望向遠方。「原來一切都可以是另一個樣子。」','眼神一亮、神情凝聚。「故事，就從這裡拐了個彎。」','後退一步、心跳停了一拍。「命運，你終於現身了。」','瞳孔放大、整個世界靜止。「此刻，時間裂開了一道縫。」'],
-  },
-  sad:{
-    p:['動作變慢、無精打采。「今天效率有點差，抱歉。」','低頭迴避視線、聲音沙啞。「很遺憾……請節哀。」','深呼吸、眼眶微紅但撐著。「我需要一點時間整理。」','雙手捂臉、肩膀顫抖。「我已經盡了所有努力……」'],
-    k:['垂頭喪氣、踢石頭。「今天大家都很忙，沒人陪我玩。」','抱著玩偶、眼眶泛紅。「我的玩具壞掉了……」','扁嘴、眼淚快掉下來。「我不要……」','嚎啕大哭、眼淚鼻涕齊流。「媽媽！不要不要不要！」'],
-    d:['看著燃盡的蠟燭、長嘆一口氣。「秋風吹落葉，總是惹人愁。」','獨自站在窗邊、眼角滑落一滴淚。「此情可待成追憶。」','雙膝發軟、緩緩坐下。「為什麼這一切都消失了？」','跌坐在地、仰望蒼天。「天理何在！為何要這樣對我！」'],
-  },
-  disgust:{
-    p:['眼神失焦、禮貌點頭。「很有趣，我們再研究。」（已下線）','單側眉毛挑高、嘴角下撇。「這不是我們該有的做法。」','後傾身體、語氣變冷。「這個方向我無法接受。」','用指尖捏起文件放遠。「這份數據完全是捏造的。」'],
-    k:['打哈欠、心不在焉。「哦，好吧。」','皺鼻子、斜眼看。「我不要吃那個綠綠的東西！」','用力推開、搖頭。「不要不要，好奇怪！」','吐舌頭、乾嘔、往後退。「噁心！好臭！快拿走！」'],
-    d:['托腮望窗外、撥弄指甲。「這世間一切，終究枯燥至極。」','嘴角一彎、語帶諷刺。「哦，真是精彩的表演。」','冷笑、用眼神劃出距離。「跟這種人同處一室，真是浪費。」','拂袖而去、不留餘地。「庸俗之輩，不值一顧。」'],
-  },
-  anger:{
-    p:['頻繁看錶、輕微嘖聲。「這會議還要開多久？」','深呼吸、說話速度變慢。「我想我們需要重新評估。」','放下筆、停頓三秒。「這件事我需要直接說清楚。」','眼神冰冷、咬牙切齒。「誰負責的？叫他立刻進來。」'],
-    k:['在地上滾來滾去、拉衣服。「好無聊喔，到底好了沒！」','雙手叉腰、鼓起腮幫子。「哼！我討厭你！」','跺腳、大聲嚷嚷。「不公平！為什麼他可以我不行！」','大哭大鬧、摔東西。「我不管！我現在就要！」'],
-    d:['按壓太陽穴、長嘆。「空氣突然變得好渾濁。」','拂袖、語帶諷刺。「真是一齣精彩的好戲啊。」','雙眼如刀、聲音低沉。「有些事，我不會忘記。」','怒髮衝冠、雙眼通紅。「我要讓所有人為此付出代價！」'],
-  },
-  anticipation:{
-    p:['靜靜觀察、不時做筆記。「先看著，時機到了再動。」','列清單、提前準備。「我已經開始研究下一階段了。」','眼神發亮、說話加速。「如果這個成了，我們就改變遊戲規則！」','在白板瘋狂畫圖、停不下來。「我看到了整個可能性！」'],
-    k:['在窗口張望、時不時回頭問。「他說過要來的吧？」','拉著大人反覆問。「還要多久？還要多久？還要多久？」','眼睛閃閃發亮、催促大人。「快點！快點！」','前一天晚上睡不著、踢來踢去。「明天到底幾點才會到！」'],
-    d:['靜靜等待、手裡捏著什麼。「也許……說不定……」','打開窗、讓風吹進來。「一種預感，什麼即將發生。」','站在岔路口、胸口澎湃。「此刻，一切皆有可能。」','仰望夜空、眼底有火光。「命運正在召喚我，我聽見了。」'],
-  },
-  calm:{
-    p:['自動回應、不太用腦。「這部分照常處理就好。」','平穩步調、不急不慢。「今天節奏還不錯。」','靜靜做完、不需要說什麼。「處理好了。」','全身放鬆、一切都對了。「現在這樣就夠了。」'],
-    k:['自己玩自己的、很專心。「我在畫畫。」','靠著大人、不說話也好。「就這樣陪著我。」','打個小盹、嘴角微微上揚。「好舒服……」','軟軟地躺著、聽到什麼都慢慢回應。「嗯……好……」'],
-    d:['靜靜坐著、讓一切流過。「有時候，不說話是最好的答案。」','輕輕閉眼、感受呼吸。「這一刻，剛剛好。」','看著遠方的雲、沒有念頭。「空，是另一種豐滿。」','消融在當下、不再有邊界。「萬物俱寂，而我在其中。」'],
-  },
+  joy:'你現在感覺亮亮的，可以把這份好心情留下來。', trust:'你感覺安全，這是可以靠近和說話的時候。', fear:'害怕不是膽小，是身體提醒你需要安全。', surprise:'事情和想像不同，先停一下再看清楚。', sad:'不用馬上變好，難過可以被陪著。', disgust:'不想靠近也是一種界線，可以溫和說不要。', anger:'生氣常常是在保護界線，先讓身體安全。', anticipation:'期待和緊張可能一起出現，這很正常。', calm:'平靜不是沒感覺，是身體暫時剛剛好。'
 };
-
-/* 表情角色 */
-const characters = [
-  {key:'child', name:'小孩 Child', faces:{joy:'😄',trust:'☺️',fear:'😟',surprise:'😮',sad:'😢',disgust:'😖',anger:'😠',anticipation:'🤩',calm:'🙂'}},
-  {key:'adult', name:'大人 Adult', faces:{joy:'😊',trust:'😌',fear:'😰',surprise:'😳',sad:'😞',disgust:'😣',anger:'😤',anticipation:'🙂‍↗️',calm:'😐'}},
-  {key:'bear',  name:'小熊 Bear',  faces:{joy:'🐻‍❄️',trust:'🐻',fear:'🐻‍❄️',surprise:'🐻',sad:'🐻‍❄️',disgust:'🐻',anger:'🐻',anticipation:'🐻‍❄️',calm:'🐻'}},
-  {key:'dog',   name:'小狗 Dog',   faces:{joy:'🐶',trust:'🐕',fear:'🐶',surprise:'🐕‍🦺',sad:'🐶',disgust:'🐕',anger:'🐶',anticipation:'🐕',calm:'🐶'}},
-  {key:'cat',   name:'貓咪 Cat',   faces:{joy:'😺',trust:'😸',fear:'🙀',surprise:'😼',sad:'😿',disgust:'😾',anger:'😾',anticipation:'😻',calm:'😽'}},
-  {key:'fox',   name:'小狐狸 Fox', faces:{joy:'🦊',trust:'🦊',fear:'🦊',surprise:'🦊',sad:'🦊',disgust:'🦊',anger:'🦊',anticipation:'🦊',calm:'🦊'}},
-];
-
-/* =========================================================
-   STATE
-   ========================================================= */
-let state = {
-  tab: 'wheel',
-  family: null,
-  character: localStorage.getItem('ew_character') || 'child',
-  role: localStorage.getItem('ew_role') || 'k',
-  selected: [],
-  drawn: [],
-  sort: [],
+const state = {
+  mode: localStorage.getItem('ew_mode_v6') || 'parent', tab:'home', family:null, selected:[], body:[], needs:[], actions:[], custom:[], drawn:[], quadMode:'child', logs: JSON.parse(localStorage.getItem('ew_logs_v6')||'[]')
 };
-
-/* =========================================================
-   HELPERS
-   ========================================================= */
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-function fam(key){ return families.find(f=>f.key===key) || families[0]; }
-function faceFor(key){ const c=characters.find(c=>c.key===state.character)||characters[0]; return c.faces[key]||'🙂'; }
-function ctxFor(family, roleId, levelIdx){
-  const rCtx = ctx[family];
-  if(!rCtx) return '';
-  return (rCtx[roleId]||rCtx['k'])[levelIdx] || '';
-}
-
-/* =========================================================
-   INIT
-   ========================================================= */
-function init(){
-  renderTabs();
-  renderWheel();
-  renderRoleBars();
-  renderCharacters();
-  renderDrawCharacters();
-  renderFilters();
-  renderExplore();
-  renderSelected();
-  newSortGame();
-}
-
-/* =========================================================
-   TABS
-   ========================================================= */
-function renderTabs(){
-  $$('#tabs button').forEach(b => {
-    b.onclick = () => {
-      state.tab = b.dataset.tab;
-      $$('#tabs button').forEach(x => x.classList.toggle('active', x===b));
-      $$('.panel').forEach(p => p.classList.toggle('active', p.id===state.tab));
-      if(state.tab==='explore') renderExplore();
-      if(state.tab==='mine') renderSelected();
-      if(state.tab==='settings'){ renderCharacters(); renderRoleBars(); }
-    };
-  });
-}
-
-/* =========================================================
-   ROLE BARS
-   ========================================================= */
-function renderRoleBars(){
-  ['globalRoleBar','settingsRoleBar'].forEach(id => {
-    const bar = document.getElementById(id);
-    if(!bar) return;
-    bar.innerHTML = roles.map(r =>
-      `<button class="role-btn${r.id===state.role?' active':''}" onclick="setRole('${r.id}')">${r.label} <span style="font-size:11px;opacity:.7;">${r.desc}</span></button>`
-    ).join('');
-  });
-}
-function setRole(id){
-  state.role = id;
-  localStorage.setItem('ew_role', id);
-  renderRoleBars();
-  if(state.family) renderSpectrum(state.family);
-  renderExplore();
-}
-
-/* =========================================================
-   WHEEL (真正 SVG 扇形)
-   ========================================================= */
-function renderWheel(){
-  const svg = document.getElementById('wheelSvg');
-  const cx=250, cy=250, gap=0.025;
-  const R = [48, 95, 148, 190];
-  const n = families.length;
-  let html = '';
-
-  families.forEach((f, i) => {
-    const sa = (i/n)*Math.PI*2 - Math.PI/2 + gap;
-    const ea = ((i+1)/n)*Math.PI*2 - Math.PI/2 - gap;
-    const hex = f.hex;
-
-    function lighten(h, amt){ /* simple lightening via mix with white */
-      const r=parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
-      const lr=Math.round(r+(255-r)*amt), lg=Math.round(g+(255-g)*amt), lb=Math.round(b+(255-b)*amt);
-      return '#'+[lr,lg,lb].map(x=>x.toString(16).padStart(2,'0')).join('');
-    }
-    function darken(h, amt){
-      const r=parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
-      const lr=Math.round(r*(1-amt)), lg=Math.round(g*(1-amt)), lb=Math.round(b*(1-amt));
-      return '#'+[lr,lg,lb].map(x=>x.toString(16).padStart(2,'0')).join('');
-    }
-
-    const fills = [darken(hex,.22), hex, lighten(hex,.28)];
-
-    for(let ri=0; ri<3; ri++){
-      const rin=R[ri], rout=R[ri+1];
-      const x1i=cx+rin*Math.cos(sa), y1i=cy+rin*Math.sin(sa);
-      const x2i=cx+rin*Math.cos(ea), y2i=cy+rin*Math.sin(ea);
-      const x1o=cx+rout*Math.cos(sa), y1o=cy+rout*Math.sin(sa);
-      const x2o=cx+rout*Math.cos(ea), y2o=cy+rout*Math.sin(ea);
-      html+=`<path d="M${x1i} ${y1i} A${rin} ${rin} 0 0 1 ${x2i} ${y2i} L${x2o} ${y2o} A${rout} ${rout} 0 0 0 ${x1o} ${y1o}Z"
-        fill="${fills[ri]}" style="cursor:pointer;transition:opacity .15s;"
-        onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'"
-        onclick="selectWheelSector('${f.key}')" id="sector-${f.key}"/>`;
-    }
-
-    /* 標籤 */
-    const ma=(sa+ea)/2, lr=(R[2]+R[3])/2;
-    const lx=cx+lr*Math.cos(ma), ly=cy+lr*Math.sin(ma);
-    html+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central"
-      font-size="13" font-weight="800" fill="${darken(hex,.45)}"
-      font-family="-apple-system,Noto Sans TC,sans-serif" style="pointer-events:none;">${f.name}</text>`;
-
-    /* 表情標籤（中層） */
-    const fr=(R[1]+R[2])/2;
-    const fx=cx+fr*Math.cos(ma), fy=cy+fr*Math.sin(ma);
-    html+=`<text x="${fx}" y="${fy}" text-anchor="middle" dominant-baseline="central"
-      font-size="18" style="pointer-events:none;">${faceFor(f.key)}</text>`;
-  });
-
-  /* 中心圓 */
-  html+=`<circle cx="${cx}" cy="${cy}" r="${R[0]-2}" fill="#fffaf2" stroke="#e8dfd1" stroke-width="1"/>`;
-  html+=`<text x="${cx}" y="${cy-7}" text-anchor="middle" font-size="11" fill="#74798c"
-    font-family="-apple-system,Noto Sans TC,sans-serif">我的</text>`;
-  html+=`<text x="${cx}" y="${cy+8}" text-anchor="middle" font-size="11" fill="#74798c"
-    font-family="-apple-system,Noto Sans TC,sans-serif">感受</text>`;
-
-  svg.innerHTML = html;
-  if(state.family) highlightWheelSector(state.family);
-}
-function selectWheelSector(key){
-  renderSpectrum(key);
-  highlightWheelSector(key);
-  showOnboardingTip();
-}
-function highlightWheelSector(key){
-  const svg = document.getElementById('wheelSvg');
-  svg.querySelectorAll('path').forEach(p=>{
-    const isSelected = p.id === 'sector-'+key;
-    p.style.opacity = isSelected ? '1' : '0.72';
-    p.style.strokeWidth = isSelected ? '3' : '0';
-    p.style.stroke = isSelected ? '#2f3349' : 'none';
-  });
-}
-let _tipShown = false;
-function showOnboardingTip(){
-  if(_tipShown || localStorage.getItem('ew_tip_shown')) return;
-  _tipShown = true;
-  localStorage.setItem('ew_tip_shown','1');
-  const card = document.getElementById('spectrumCard');
-  const tip = document.createElement('div');
-  tip.className = 'tip-bubble';
-  tip.textContent = '點詞彙可加入「我的感受」！';
-  card.style.position = 'relative';
-  card.appendChild(tip);
-  setTimeout(()=>tip.remove(), 4500);
-}
-
-/* =========================================================
-   SPECTRUM
-   ========================================================= */
-function renderSpectrum(key){
-  state.family = key;
-  const f = fam(key);
-  $('#spectrumTitle').textContent = f.name + ' 光譜';
-  $('#spectrumHint').textContent = f.hint + '｜由輕到強，找比較貼近的詞。';
-
-  const list = emotions.filter(e=>e.family===key);
-  const roleId = state.role;
-  const face = faceFor(key);
-
-  /* group by level bucket (every 2 words = 1 level, 8 words → 4 levels) */
-  const bucketSize = Math.ceil(list.length / levels.length);
-  const buckets = levels.map((lv,li) => ({lv, words: list.slice(li*bucketSize,(li+1)*bucketSize)}));
-
-  $('#spectrum').innerHTML = buckets.map((b,bi) => {
-    if(!b.words.length) return '';
-    const ctxText = ctxFor(key, roleId, Math.min(bi,3));
-    const chips = b.words.map(e=>`<div class="spec-chip" style="--tone:${f.color};"
-          onclick="addEmotion(${e.id})"
-          title="${ctxText}">
-          ${face} ${e.word}
-          <small>${e.desc}</small>
-        </div>`).join('');
-    return `<div class="spec-row">
-      <div class="spec-level">${b.lv}</div>
-      <div class="spec-bar" style="grid-template-columns:repeat(${b.words.length},1fr);">${chips}</div>
-    </div>`;
-  }).join('') || '<div class="empty">這個情緒尚未建立詞彙。</div>';
-
-  /* 混合情緒 */
-  if(f.blends && f.blends.length){
-    $('#blendRow').style.display='block';
-    $('#blendChips').innerHTML = f.blends.map(b=>`<span class="blend-chip">${b}</span>`).join('');
-  } else {
-    $('#blendRow').style.display='none';
-  }
-
-  /* 展開情境說明面板 */
-  const existCtx = document.getElementById('ctxDetail');
-  if(existCtx) existCtx.remove();
-
-  const roleInfo = roles.find(r=>r.id===roleId);
-  const allCtx = [0,1,2,3].map(i=>ctxFor(key,roleId,i));
-  const div = document.createElement('div');
-  div.id = 'ctxDetail';
-  div.className = 'ctx-panel';
-  div.style.setProperty('--tone-border', f.hex);
-  div.innerHTML = `<div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;">${roleInfo.label} 的情境說明</div>`
-    + allCtx.map((c,i)=>`<div class="ctx-row"><div class="ctx-label">${levels[i]}</div><div class="ctx-quote">${c}</div></div>`).join('');
-  $('#spectrumCard').appendChild(div);
-}
-
-/* =========================================================
-   EXPLORE
-   ========================================================= */
-function renderFilters(){
-  const box = $('#filterChips');
-  const allBtn = `<button class="fchip active" data-f="all" onclick="filterClick(this,'all')">全部</button>`;
-  const famBtns = families.map(f=>`<button class="fchip" data-f="${f.key}" onclick="filterClick(this,'${f.key}')">${f.name}</button>`).join('');
-  const calmBtn = `<button class="fchip" data-f="calm" onclick="filterClick(this,'calm')">平靜</button>`;
-  box.innerHTML = allBtn + famBtns + calmBtn;
-}
-function filterClick(el, f){
-  $$('#filterChips .fchip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderExplore(f);
-}
-function renderExplore(forceFilter){
-  const q = ($('#searchInput')?.value||'').trim();
-  const filter = forceFilter || ($('#filterChips .active')?.dataset.f||'all');
-  let list = emotions.filter(e=>(filter==='all'||e.family===filter)&&(q===''||[e.word,e.en,e.desc,fam(e.family).name].join(' ').includes(q)));
-  $('#emotionGrid').innerHTML = list.map(cardHtml).join('') || '<div class="empty">找不到相近詞。</div>';
-}
-$('#searchInput')?.addEventListener('input',()=>renderExplore());
-function cardHtml(e){
-  const f=fam(e.family);
-  return `<div class="emotion-card${state.selected.includes(e.id)?' selected':''}" style="--tone:${f.color}" onclick="addEmotion(${e.id})">
-    <div class="ec-word">${e.word}</div>
-    <div class="ec-en">${f.name}・${e.en}</div>
-    <div class="ec-desc">${e.desc}</div>
-    <div class="ec-face">${faceFor(e.family)}</div>
-  </div>`;
-}
-
-/* =========================================================
-   CHARACTERS
-   ========================================================= */
-function renderCharacters(){
-  $('#characters').innerHTML = characters.map(c =>
-    `<div class="char-item${state.character===c.key?' active':''}" onclick="setCharacter('${c.key}')">
-      <div class="char-avatar">${c.faces.joy}</div>
-      <div><strong>${c.name}</strong><br><span class="tiny">表情角色</span></div>
-    </div>`
-  ).join('');
-}
-function renderDrawCharacters(){
-  $('#drawCharacters').innerHTML = characters.map(c =>
-    `<div class="char-item${state.character===c.key?' active':''}" onclick="setCharacter('${c.key}')" style="min-width:100px;padding:6px 10px;">
-      <div class="char-avatar" style="font-size:24px;">${c.faces.joy}</div>
-      <div><strong style="font-size:12px;">${c.name.split(' ')[0]}</strong></div>
-    </div>`
-  ).join('');
-}
-function setCharacter(key){
-  state.character = key;
-  localStorage.setItem('ew_character', key);
-  renderCharacters();
-  renderDrawCharacters();
-  renderWheel();
-  if(state.family) renderSpectrum(state.family);
-  renderExplore();
-  renderSelected();
-}
-
-/* =========================================================
-   ADD / REMOVE EMOTION
-   ========================================================= */
-function addEmotion(id){
-  const wasIn = state.selected.includes(id);
-  if(!wasIn) state.selected.push(id);
-  else state.selected = state.selected.filter(x=>x!==id);
-  renderExplore();
-  renderSelected();
-  updateMineBadge();
-  if(!wasIn) showAddToast();
-}
-function showAddToast(){
-  const t = document.getElementById('addToast');
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(()=>t.classList.remove('show'), 2000);
-}
-function updateMineBadge(){
-  const badge = document.getElementById('mineBadge');
-  if(!badge) return;
-  const n = state.selected.length;
-  badge.textContent = n;
-  badge.style.display = n > 0 ? 'inline-flex' : 'none';
-}
-function clearSelected(){ state.selected=[]; renderExplore(); renderSelected(); updateMineBadge(); }
-function renderSelected(){
-  const box = $('#selectedList');
-  if(!state.selected.length){
-    box.innerHTML='<div class="empty">尚未選擇情緒</div>';
-    $('#posterFace').textContent=faceFor('calm');
-    $('#posterText').textContent='我現在有一點感覺';
-    return;
-  }
-  const list = state.selected.map(id=>emotions.find(e=>e.id===id)).filter(Boolean);
-  box.innerHTML = list.map(e=>`<span class="pill" onclick="addEmotion(${e.id})">${faceFor(e.family)} ${e.word}</span>`).join('');
-  $('#posterFace').textContent = list.slice(0,3).map(e=>faceFor(e.family)).join(' ');
-  $('#posterText').textContent = '我現在覺得：' + list.map(e=>e.word).join('、');
-  $('#posterSub').textContent = $('#reason')?.value || '可以慢慢說，不用一次說清楚。';
-}
-$('#reason')?.addEventListener('input', renderSelected);
-
-/* =========================================================
-   DRAW
-   ========================================================= */
-function drawEmotion(unique=false){
-  let pool = emotions;
-  if(unique){ pool=emotions.filter(e=>!state.drawn.includes(e.id)); if(!pool.length){state.drawn=[];pool=emotions;} }
-  const e = pool[Math.floor(Math.random()*pool.length)];
-  state.drawn.push(e.id);
-  const f = fam(e.family);
-  const ctxIdx = e.level||0;
-  const ctxText = ctxFor(e.family, state.role, Math.min(ctxIdx,3));
-  const roleInfo = roles.find(r=>r.id===state.role);
-  $('#drawResult').innerHTML = `
-    <div class="bigface">${faceFor(e.family)}</div>
-    <div class="bigword">${e.word}</div>
-    <p class="prompt">${e.desc}<br>什麼時候會有這種心情？</p>
-    <div class="draw-ctx">${roleInfo.label}：${ctxText}</div>
-    <div class="toolbar" style="justify-content:center;margin-top:12px;">
-      <button onclick="addEmotion(${e.id})">加入我的感受</button>
-    </div>`;
-  $('#drawResult').style.background=`linear-gradient(145deg,rgba(255,255,255,.88),${f.hex}55)`;
-}
-function resetDrawn(){ state.drawn=[]; $('#drawResult').innerHTML='<div class="bigface">🎲</div><div class="bigword">還沒抽</div><p class="prompt">按上方按鈕，看看今天會遇到哪一種感受。</p>';}
-
-/* =========================================================
-   SORT GAME
-   ========================================================= */
-function newSortGame(){
-  state.sort=[];
-  const key = families[Math.floor(Math.random()*families.length)].key;
-  const list = emotions.filter(e=>e.family===key).slice(0,4);
-  $('#sortBoard').innerHTML = levels.map((l,i)=>`<div class="slot" data-index="${i}">${l}</div>`).join('');
-  $('#sortPool').innerHTML = list.sort(()=>Math.random()-.5).map(e=>`
-    <div class="emotion-card" style="--tone:${fam(e.family).color}" onclick="placeSort(${e.id})">
-      <div class="ec-word">${faceFor(e.family)} ${e.word}</div>
-      <div class="ec-desc">${e.desc}</div>
-    </div>`).join('');
-}
-function placeSort(id){
-  const e=emotions.find(e=>e.id===id);
-  const empty=$$('#sortBoard .slot').find(s=>!s.classList.contains('filled'));
-  if(!empty) return;
-  empty.classList.add('filled');
-  empty.innerHTML=`<div><div class="ec-word">${faceFor(e.family)} ${e.word}</div><div class="tiny">${e.desc}</div></div>`;
-}
-function clearSort(){ $$('#sortBoard .slot').forEach((s,i)=>{s.classList.remove('filled');s.textContent=levels[i];}); }
-function showSortRef(){
-  const ref = document.getElementById('sortRef');
-  const pool = $$('#sortPool .emotion-card');
-  if(!pool.length){ ref.style.display='none'; return; }
-  const words = pool.map(c=>c.querySelector('.ec-word')?.textContent||'').filter(Boolean);
-  ref.style.display = 'block';
-  ref.innerHTML = '<strong>參考排序（依詞彙強度，僅供討論）：</strong><br>' + words.join(' → ') + '<br><span style="font-size:11px;color:var(--muted);">沒有標準答案，重要的是說出你的理由。</span>';
-}
-
-/* =========================================================
-   QUADRANT
-   ========================================================= */
-function autoFillQuad(){
-  clearQuad();
-  ['highGood','highHard','lowGood','lowHard'].forEach(q=>{
-    const zone=document.getElementById('dz-'+q);
-    emotions.filter(e=>e.quad===q).slice(0,5).forEach(e=>{
-      const sp=document.createElement('span');
-      sp.className='pill';
-      sp.textContent=faceFor(e.family)+' '+e.word;
-      zone.appendChild(sp);
-    });
-  });
-}
-function clearQuad(){ ['highGood','highHard','lowGood','lowHard'].forEach(q=>{ document.getElementById('dz-'+q).innerHTML=''; }); }
-
-/* =========================================================
-   SAVE FEELING CARD
-   ========================================================= */
-function saveFeelingCard(){
-  const c=$('#posterCanvas'), ctx2=c.getContext('2d');
-  ctx2.fillStyle='#fffaf2'; ctx2.fillRect(0,0,c.width,c.height);
-  ctx2.fillStyle='#2f3349'; ctx2.textAlign='center';
-  ctx2.font='96px sans-serif'; ctx2.fillText($('#posterFace').textContent,600,250);
-  ctx2.font='bold 52px sans-serif'; wrap(ctx2,$('#posterText').textContent,600,380,960,66);
-  ctx2.font='30px sans-serif'; ctx2.fillStyle='#74798c'; wrap(ctx2,$('#posterSub').textContent,600,600,940,46);
-  ctx2.font='22px sans-serif'; ctx2.fillText('情緒輪光譜 v5｜我現在的感受',600,800);
-  const dataUrl = c.toDataURL('image/png');
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  if(isIOS){
-    const w = window.open('', '_blank');
-    if(w){ w.document.write('<img src="'+dataUrl+'" style="max-width:100%;"><p style="font-family:sans-serif;color:#555;text-align:center;">長按圖片，選擇「儲存到相片」</p>'); }
-  } else {
-    const a=document.createElement('a'); a.href=dataUrl; a.download='我的感受.png'; a.click();
-  }
-}
-function wrap(ctx2,text,x,y,maxWidth,lineHeight){
-  let words=[...text],line='';
-  for(let n=0;n<words.length;n++){let test=line+words[n];if(ctx2.measureText(test).width>maxWidth&&n>0){ctx2.fillText(line,x,y);line=words[n];y+=lineHeight;}else line=test;}
-  ctx2.fillText(line,x,y);
-}
-
-/* =========================================================
-   SETTINGS
-   ========================================================= */
-function exportSettings(){
-  const obj={character:state.character,role:state.role,selected:state.selected.map(id=>emotions.find(e=>e.id===id)?.word)};
-  $('#settingsOutput').textContent=JSON.stringify(obj,null,2);
-  navigator.clipboard?.writeText($('#settingsOutput').textContent);
-}
-function resetAll(){
-  ['ew_character','ew_role','ew_tip_shown'].forEach(k=>localStorage.removeItem(k));
-  state={tab:'wheel',family:null,character:'child',role:'k',selected:[],drawn:[],sort:[]};
-  $$('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab==='wheel'));
-  $$('.panel').forEach(p=>p.classList.toggle('active',p.id==='wheel'));
-  init();
-  updateMineBadge();
-}
-
-/* =========================================================
-   PWA
-   ========================================================= */
-// PWA Service Worker
-if("serviceWorker" in navigator && !location.hostname.includes("claudeusercontent")){
-  navigator.serviceWorker.register("./sw.js", {scope: "./"})
-    .then(r => console.log("SW registered:", r.scope))
-    .catch(e => console.warn("SW:", e));
-}
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;});
-$('#installBtn').onclick=async()=>{
-  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;}
-  else alert('可用瀏覽器選單「加入主畫面」或「安裝應用程式」。');
-};
-
+const emotions = rawEmotions.map((r,i)=>({id:i,family:r[0],word:r[1],kid:r[2],desc:r[3],quad:r[4],level:r[5]}));
+function $(s){return document.querySelector(s)} function $$(s){return Array.from(document.querySelectorAll(s))} function fam(k){return families.find(f=>f.key===k)||families[0]} function allowedFamilies(){return modes[state.mode].families} function allowedEmotions(){const m=modes[state.mode];return emotions.concat(state.custom).filter(e=>allowedFamilies().includes(e.family||'calm') && (e.level||1)<=m.maxLevel)} function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1800)}
+function init(){renderTabs();renderModes();renderHome();renderWheel();renderSpectrum(null);renderBody();renderNeeds();renderExplore();renderDrawBlank();newSortGame();renderQuad();renderLogs();registerPwa();}
+function renderTabs(){const nav=$('#tabs');nav.innerHTML=tabs.map(t=>`<button data-tab="${t[0]}" onclick="goTab('${t[0]}')">${t[1]}${t[0]==='mine'?'<span class="badge" id="mineBadge" style="display:none">0</span>':''}</button>`).join('');updateTabs();}
+function updateTabs(){$$('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.tab));$$('.panel').forEach(p=>p.classList.toggle('active',p.id===state.tab));updateBadge();}
+function goTab(id){state.tab=id;updateTabs();if(id==='explore')renderExplore();if(id==='mine')renderPoster();if(id==='log')renderLogs();window.scrollTo({top:0,behavior:'smooth'});} 
+function renderModes(){const box=$('#modeBar');box.innerHTML=Object.entries(modes).map(([k,m])=>`<button class="ghost ${state.mode===k?'active':''}" onclick="setMode('${k}')">${m.label}<span class="tiny" style="color:inherit;opacity:.75">${m.hint}</span></button>`).join('')}
+function setMode(k){state.mode=k;localStorage.setItem('ew_mode_v6',k);state.selected=state.selected.filter(id=>allowedEmotions().some(e=>e.id===id));renderModes();renderHome();renderWheel();renderSpectrum(state.family);renderExplore();renderPoster();newSortGame();toast('已切換：'+modes[k].label)}
+function renderHome(){const list=families.filter(f=>allowedFamilies().includes(f.key)).filter(f=>state.mode==='toddler'?f.core:true);$('#homeCards').innerHTML=list.map(f=>`<div class="bigcard" style="--tone:${f.color}" onclick="chooseFamilyFromHome('${f.key}')"><div class="big-emoji">${f.emoji}</div><div class="big-word">${f.name}</div><div class="big-plain">${f.plain}</div></div>`).join('')}
+function chooseFamilyFromHome(k){state.family=k;renderSpectrum(k);goTab('wheel')}
+function quickSelectSpecial(word){const id='s'+Date.now();state.custom.push({id,family:'calm',word,kid:word,desc:'這也是一種可以被保留的感覺',quad:'lowHard',level:1,custom:true});state.selected.push(id);renderPoster();goTab('mine');toast('已加入：'+word)}
+function renderWheel(){const svg=$('#wheelSvg');const list=families.filter(f=>allowedFamilies().includes(f.key)).filter(f=>state.mode==='toddler'?f.core:true);const cx=250,cy=250,rin=82,rout=205;let html='';list.forEach((f,i)=>{const n=list.length;const sa=(i/n)*Math.PI*2-Math.PI/2+0.018;const ea=((i+1)/n)*Math.PI*2-Math.PI/2-0.018;const x1=cx+rin*Math.cos(sa),y1=cy+rin*Math.sin(sa),x2=cx+rin*Math.cos(ea),y2=cy+rin*Math.sin(ea),x3=cx+rout*Math.cos(ea),y3=cy+rout*Math.sin(ea),x4=cx+rout*Math.cos(sa),y4=cy+rout*Math.sin(sa);html+=`<path d="M${x1} ${y1} A${rin} ${rin} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${rout} ${rout} 0 0 0 ${x4} ${y4}Z" fill="${f.hex}" opacity="${state.family===f.key?1:.82}" stroke="#fffaf2" stroke-width="5" onclick="selectFamily('${f.key}')"/>`;const ma=(sa+ea)/2,tx=cx+155*Math.cos(ma),ty=cy+155*Math.sin(ma);html+=`<text x="${tx}" y="${ty-6}" text-anchor="middle" font-size="21" font-weight="900" fill="#2f3349" style="pointer-events:none">${f.emoji}</text><text x="${tx}" y="${ty+24}" text-anchor="middle" font-size="16" font-weight="900" fill="#2f3349" style="pointer-events:none">${f.name}</text>`});html+=`<circle cx="250" cy="250" r="76" fill="#fffaf2" stroke="#e8dfd1" stroke-width="2"/><text x="250" y="244" text-anchor="middle" font-size="14" font-weight="900" fill="#74798c">我的</text><text x="250" y="264" text-anchor="middle" font-size="14" font-weight="900" fill="#74798c">感受</text>`;svg.innerHTML=html}
+function selectFamily(k){state.family=k;renderWheel();renderSpectrum(k)}
+function renderSpectrum(k){const title=$('#spectrumTitle'),hint=$('#spectrumHint'),box=$('#spectrum'),ctxBox=$('#contextBox');if(!k){title.textContent='選一種核心情緒';hint.textContent='每排代表強度，點詞彙加入我的感受。';box.innerHTML='<div class="empty">請先點左側情緒輪。</div>';ctxBox.innerHTML='';return}const f=fam(k);title.textContent=f.emoji+' '+f.name+' 光譜';hint.textContent=f.plain+'｜由小到大，找比較貼近的詞。';const list=allowedEmotions().filter(e=>e.family===k);box.innerHTML=levels.map((lv,idx)=>{const arr=list.filter(e=>Math.min(e.level,4)===idx+1);if(!arr.length)return '';return `<div class="spec-row"><div class="spec-level">${lv}</div><div class="spec-bar">${arr.map(e=>`<div class="spec-chip ${state.selected.includes(e.id)?'selected':''}" style="--tone:${f.color}" onclick="toggleEmotion('${e.id}')">${f.emoji} ${e.word}<small>${state.mode==='toddler'?e.kid:e.desc}</small></div>`).join('')}</div></div>`}).join('')||'<div class="empty">目前模式沒有這類詞彙。</div>';ctxBox.innerHTML=`<div class="empty" style="text-align:left;border-left:5px solid ${f.hex}"><b>陪伴句：</b>${ctx[k]||''}<br><span class="tiny">提醒：不要急著要求孩子說清楚，先確認安全，再慢慢命名。</span></div>`}
+function toggleEmotion(id){if(state.selected.includes(id))state.selected=state.selected.filter(x=>x!==id);else state.selected.push(id);renderSpectrum(state.family);renderExplore();renderPoster();toast(state.selected.includes(id)?'已加入我的感受':'已移除')}
+function renderBody(){const box=$('#bodyMap');box.innerHTML=bodySignals.map((b,i)=>`<div class="need ${state.body.includes(b[0])?'selected':''}" onclick="toggleBody('${b[0]}')">${b[0]}<br><span class="tiny" style="color:inherit;opacity:.75">${b[1]}</span></div>`).join('');const list=$('#bodyList');if(list)list.innerHTML=state.body.length?state.body.map(x=>`<span class="pill" onclick="toggleBody('${x}')">${x} ✕</span>`).join(''):'<div class="empty">尚未選擇</div>'}
+function toggleBody(x){state.body.includes(x)?state.body=state.body.filter(v=>v!==x):state.body.push(x);renderBody();renderPoster()}
+function renderNeeds(){ $('#needGrid').innerHTML=needs.map(n=>`<div class="need ${state.needs.includes(n)?'selected':''}" onclick="toggleNeed('${n}')">${n}</div>`).join(''); $('#actionGrid').innerHTML=actions.map(n=>`<div class="need ${state.actions.includes(n)?'selected':''}" onclick="toggleAction('${n}')">${n}</div>`).join('')}
+function toggleNeed(n){state.needs.includes(n)?state.needs=state.needs.filter(x=>x!==n):state.needs.push(n);renderNeeds();renderPoster()} function toggleAction(n){state.actions.includes(n)?state.actions=state.actions.filter(x=>x!==n):state.actions.push(n);renderNeeds();renderPoster()}
+function renderPoster(){const list=state.selected.map(id=>allowedEmotions().find(e=>String(e.id)===String(id))||state.custom.find(e=>String(e.id)===String(id))).filter(Boolean);$('#selectedList').innerHTML=list.length?list.map(e=>`<span class="pill" onclick="toggleEmotion('${e.id}')">${fam(e.family).emoji} ${e.word} ✕</span>`).join(''):'<div class="empty">尚未選擇情緒</div>';$('#posterFace').textContent=list.length?list.slice(0,4).map(e=>fam(e.family).emoji).join(' '):'🙂';const title=list.length?'我現在覺得：'+list.map(e=>e.word).join('、'):'我現在有一點感覺';$('#posterTitle').textContent=title;const event=$('#eventText')?.value.trim();let parts=[];if(state.body.length)parts.push('身體：'+state.body.join('、'));if(event)parts.push('事情：'+event);if(state.needs.length)parts.push('我需要：'+state.needs.join('、'));if(state.actions.length)parts.push('下一步：'+state.actions.join('、'));$('#posterText').textContent=parts.join('｜')||'可以慢慢說，不用一次說清楚。';updateBadge()}
+['eventText'].forEach(id=>setTimeout(()=>{const el=document.getElementById(id);if(el)el.addEventListener('input',renderPoster)},0));
+function updateBadge(){const b=$('#mineBadge');if(!b)return; b.textContent=state.selected.length; b.style.display=state.selected.length?'inline-flex':'none'}
+function clearSelected(){state.selected=[];state.needs=[];state.actions=[];renderNeeds();renderSpectrum(state.family);renderExplore();renderPoster()}
+function renderExplore(filter='all'){const q=($('#searchInput')?.value||'').trim();const fbox=$('#filterChips');if(fbox&&!fbox.dataset.ready){fbox.innerHTML='<button class="chip active" onclick="setFilter(this,\'all\')">全部</button>'+families.filter(f=>allowedFamilies().includes(f.key)).map(f=>`<button class="chip" onclick="setFilter(this,'${f.key}')">${f.emoji} ${f.name}</button>`).join('');fbox.dataset.ready='1'}const active=filter==='all'?($('#filterChips .active')?.dataset?.filter||'all'):filter;let list=allowedEmotions().filter(e=>(active==='all'||e.family===active)&&(!q||[e.word,e.kid,e.desc,fam(e.family).name].join(' ').includes(q)));$('#emotionGrid').innerHTML=list.map(e=>`<div class="emotion-card ${state.selected.includes(e.id)?'selected':''}" style="--tone:${fam(e.family).color}" onclick="toggleEmotion('${e.id}')"><div class="ec-word">${fam(e.family).emoji} ${e.word}</div><div class="ec-en">${fam(e.family).name}・Level ${e.level}</div><div class="ec-desc">${state.mode==='toddler'?e.kid:e.desc}</div></div>`).join('')||'<div class="empty">找不到相近詞。</div>'}
+function setFilter(el,f){$$('#filterChips .chip').forEach(c=>{c.classList.remove('active');c.dataset.filter=''});el.classList.add('active');el.dataset.filter=f;renderExplore(f)} setTimeout(()=>{$('#searchInput')?.addEventListener('input',()=>renderExplore())},0)
+function renderDrawBlank(){$('#drawResult').innerHTML='<div class="face">🎲</div><div class="word">還沒抽</div><div class="text">按左側按鈕，看看今天遇到哪一種感受。</div>'}
+function drawEmotion(unique=false){let pool=allowedEmotions();if(unique){pool=pool.filter(e=>!state.drawn.includes(e.id));if(!pool.length){state.drawn=[];pool=allowedEmotions()}}const e=pool[Math.floor(Math.random()*pool.length)];state.drawn.push(e.id);$('#drawResult').style.background=`linear-gradient(145deg,#fff,${fam(e.family).hex}66)`;$('#drawResult').innerHTML=`<div class="face">${fam(e.family).emoji}</div><div class="word">${e.word}</div><div class="text">${e.desc}<br>${ctx[e.family]||''}</div><div class="toolbar" style="justify-content:center;margin-top:14px"><button onclick="toggleEmotion('${e.id}')">加入我的感受</button></div>`}
+function newSortGame(){const keys=allowedFamilies();const key=keys[Math.floor(Math.random()*keys.length)];const list=allowedEmotions().filter(e=>e.family===key).slice(0,4);$('#sortBoard').innerHTML=levels.map(l=>`<div class="slot">${l}</div>`).join('');$('#sortPool').innerHTML=list.sort(()=>Math.random()-.5).map(e=>`<div class="emotion-card" style="--tone:${fam(e.family).color}" onclick="placeSort('${e.id}')"><div class="ec-word">${fam(e.family).emoji} ${e.word}</div><div class="ec-desc">${e.desc}</div></div>`).join('')||'<div class="empty">目前模式詞彙太少。</div>';$('#sortRef').style.display='none'}
+function placeSort(id){const e=allowedEmotions().find(e=>String(e.id)===String(id));const empty=$$('#sortBoard .slot').find(s=>!s.classList.contains('filled'));if(!empty||!e)return;empty.classList.add('filled');empty.innerHTML=`<div><div class="ec-word">${fam(e.family).emoji} ${e.word}</div><div class="tiny">${e.desc}</div></div>`}
+function clearSort(){$$('#sortBoard .slot').forEach((s,i)=>{s.classList.remove('filled');s.textContent=levels[i]})} function showSortRef(){const ref=$('#sortRef');ref.style.display='block';ref.innerHTML='參考排序只是討論起點。可以問：「你為什麼覺得它比較大？」'}
+function setQuadMode(m){state.quadMode=m;$('#quadChildBtn').classList.toggle('active',m==='child');$('#quadAdultBtn').classList.toggle('active',m==='adult');renderQuad()}
+function renderQuad(){const labels=state.quadMode==='child'?[['highGood','高能量・舒服','⚡🙂'],['highHard','高能量・不舒服','⚡🙁'],['lowGood','低能量・舒服','🌙🙂'],['lowHard','低能量・不舒服','🌧️🙁']]:[['highGood','舒服・有掌控','🧭🙂'],['highHard','不舒服・有掌控','🧭🙁'],['lowGood','舒服・低掌控','🌊🙂'],['lowHard','不舒服・低掌控','🌊🙁']];$('#quadGrid').innerHTML=labels.map(l=>`<div class="quad"><h3>${l[1]} <span>${l[2]}</span></h3><div class="dropzone" id="dz-${l[0]}"></div></div>`).join('')}
+function autoFillQuad(){clearQuad();['highGood','highHard','lowGood','lowHard'].forEach(q=>{const z=$('#dz-'+q);allowedEmotions().filter(e=>e.quad===q).slice(0,6).forEach(e=>z.insertAdjacentHTML('beforeend',`<span class="pill">${fam(e.family).emoji} ${e.word}</span>`))})} function clearQuad(){$$('.dropzone').forEach(z=>z.innerHTML='')}
+function buildCheckin(){const names=$('#studentNames').value.split('\n').map(s=>s.trim()).filter(Boolean);if(!names.length){toast('請先輸入名單');return}$('#checkinGrid').innerHTML=names.map(n=>`<div class="student"><div class="emoji">🙂</div><div class="name">${escapeHtml(n)}</div><select onchange="this.parentNode.querySelector('.emoji').textContent=this.selectedOptions[0].dataset.emoji"><option data-emoji="🙂">平靜</option>${families.filter(f=>allowedFamilies().includes(f.key)).map(f=>`<option data-emoji="${f.emoji}">${f.name}</option>`).join('')}</select></div>`).join('')}
+function clearCheckin(){$('#checkinGrid').innerHTML='<div class="empty">尚未建立名單</div>'}
+function saveLog(){const list=state.selected.map(id=>allowedEmotions().find(e=>String(e.id)===String(id))||state.custom.find(e=>String(e.id)===String(id))).filter(Boolean);if(!list.length){toast('請先選情緒');return}const item={time:new Date().toISOString(),mode:state.mode,emotions:list.map(e=>e.word),body:[...state.body],needs:[...state.needs],actions:[...state.actions],event:$('#eventText').value.trim()};state.logs.unshift(item);localStorage.setItem('ew_logs_v6',JSON.stringify(state.logs));toast('已存入紀錄');renderLogs()}
+function renderLogs(){const box=$('#logList');if(!box)return;if(!state.logs.length){box.innerHTML='<div class="empty">尚無紀錄</div>';$('#logSummary').textContent='尚無紀錄';$('#logProgress').style.width='0%';return}const count={};state.logs.forEach(l=>l.emotions.forEach(e=>count[e]=(count[e]||0)+1));const top=Object.entries(count).sort((a,b)=>b[1]-a[1])[0];$('#logSummary').textContent=`共 ${state.logs.length} 筆紀錄｜最常出現：${top?top[0]:'無'}`;$('#logProgress').style.width=Math.min(100,state.logs.length*8)+'%';box.innerHTML=state.logs.map(l=>`<div class="log-item"><b>${new Date(l.time).toLocaleString('zh-TW')}｜${l.emotions.join('、')}</b><p>${l.event||'未填事件'}${l.body.length?'｜身體：'+l.body.join('、'):''}${l.needs.length?'｜需要：'+l.needs.join('、'):''}</p></div>`).join('')}
+function exportLogs(){downloadText('emotion-logs.json',JSON.stringify(state.logs,null,2),'application/json')} function downloadLogsCsv(){const rows=[['time','mode','emotions','body','needs','actions','event']].concat(state.logs.map(l=>[l.time,l.mode,l.emotions.join('|'),l.body.join('|'),l.needs.join('|'),l.actions.join('|'),l.event]));downloadText('emotion-logs.csv',rows.map(r=>r.map(v=>'"'+String(v||'').replaceAll('"','""')+'"').join(',')).join('\n'),'text/csv;charset=utf-8')} function clearLogs(){if(confirm('確定清除本機紀錄？')){state.logs=[];localStorage.removeItem('ew_logs_v6');renderLogs()}}
+function addCustomEmotion(){const word=$('#customWord').value.trim();if(!word){toast('請輸入感覺名稱');return}const id='c'+Date.now();const e={id,family:'calm',word,kid:word,desc:$('#customDesc').value.trim()||'我自己的感覺詞',quad:'lowHard',level:1,custom:true};state.custom.push(e);state.selected.push(id);$('#customWord').value='';$('#customDesc').value='';renderPoster();toast('已加入自訂感覺');goTab('mine')}
+function savePoster(){const canvas=$('#posterCanvas'),ctx2=canvas.getContext('2d');ctx2.fillStyle='#fffaf2';ctx2.fillRect(0,0,1200,900);ctx2.strokeStyle='#e8dfd1';ctx2.lineWidth=8;roundRect(ctx2,40,40,1120,820,48);ctx2.stroke();ctx2.fillStyle='#2f3349';ctx2.textAlign='center';ctx2.font='900 56px sans-serif';ctx2.fillText('我的感受卡',600,130);ctx2.font='72px serif';ctx2.fillText($('#posterFace').textContent,600,245);ctx2.font='900 44px sans-serif';wrap(ctx2,$('#posterTitle').textContent,600,335,1000,58,true);ctx2.font='28px sans-serif';ctx2.fillStyle='#55596a';wrap(ctx2,$('#posterText').textContent,600,500,980,42,true);ctx2.font='20px sans-serif';ctx2.fillStyle='#74798c';ctx2.fillText('情緒輪光譜｜'+new Date().toLocaleDateString('zh-TW'),600,805);const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='我的感受卡.png';a.click()} 
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()} function wrap(ctx,text,x,y,maxWidth,lineHeight,center=false){const chars=String(text||'').split('');let line='',yy=y;for(let i=0;i<chars.length;i++){const test=line+chars[i];if(ctx.measureText(test).width>maxWidth&&i>0){ctx.fillText(line,x,yy);line=chars[i];yy+=lineHeight}else line=test}ctx.fillText(line,x,yy)}
+function exportSettings(){const data={version:APP_VERSION,mode:state.mode,logs:state.logs.length,custom:state.custom};$('#settingsOutput').textContent=JSON.stringify(data,null,2);navigator.clipboard?.writeText(JSON.stringify(data,null,2));toast('設定已複製')}
+function resetAll(){if(confirm('恢復預設會清除目前選取與自訂詞，但不清除紀錄。')){state.mode='parent';state.family=null;state.selected=[];state.body=[];state.needs=[];state.actions=[];state.custom=[];localStorage.setItem('ew_mode_v6','parent');renderModes();renderHome();renderWheel();renderSpectrum(null);renderBody();renderNeeds();renderExplore();renderPoster();toast('已恢復預設')}}
+function downloadText(name,text,type){const blob=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)} function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function openManual(){$('#manual').classList.add('show')} function closeManual(){$('#manual').classList.remove('show')}
+let deferredPrompt;function registerPwa(){window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('#installBtn').disabled=false});$('#installBtn').addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}else toast('若瀏覽器支援，請從選單加入主畫面')});if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}}
 init();
-updateMineBadge();
 </script>
 </body>
 </html>
